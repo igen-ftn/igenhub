@@ -5,6 +5,8 @@ services:
     image: postgres
   web:
     build: .
+    command: python3 manage.py migrate
+    command: python3 manage.py makemigrations igenapp
     command: python3 manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
