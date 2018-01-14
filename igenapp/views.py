@@ -14,3 +14,16 @@ def insert(request, tea):
     Example.objects.create(text=tea)
     #ispise sve upisane objekte
     return HttpResponse(Example.objects.all())
+
+def home(request):
+    return render(request, 'igenapp/home.html')
+
+def wiki(request):
+    return render(request, 'igenapp/wiki.html')
+
+def issues(request):
+    return render(request, 'igenapp/issues.html')
+
+def commits(request):
+    return render(request, 'igenapp/commits.html')
+
