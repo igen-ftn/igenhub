@@ -12,7 +12,10 @@ PostgreSQL
 
 ## run the application
 
+(sudo) docker-compose run web python3 manage.py makemigration
 docker-compose up
 if it does not work then:
 
-sudo docker-compose up    
+sudo docker-compose up   
+   
+docker-compose up may not start the app properly the first time, try stopping it applying makemigration command and then trying again    
