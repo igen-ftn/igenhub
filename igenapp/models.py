@@ -10,6 +10,33 @@ class Example(models.Model):
         return self.text
 
 
+class Label(models.Model):
+
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=20)
+    COLOR_CHOICE = (
+        ('R', 'RED'),
+        ('B', 'BLUE'),
+        ('Y', 'YELLOW'),
+        ('G', 'GREEN'),
+    )
+    color = models.CharField(max_length=1, choices=COLOR_CHOICE)
+
+
+class Milestone(models.Model):
+
+    id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=100)
+    description = models.CharField(max_length=500)
+    creation_date = models.DateField()
+    due_date = models.DateField()
+    STATUS_CHOICE = (
+        ('O', 'Open'),
+        ('C', 'Closed'),
+    )
+    status = models.CharField(max_length=1, choices=STATUS_CHOICE)
+
+
 class Issue(models.Model):
 
     id = models.AutoField(primary_key=True)
@@ -17,15 +44,16 @@ class Issue(models.Model):
     text = models.CharField(max_length=500)
     ordinal = models.IntegerField()
     date = models.DateField()
-    status = (
+    STATUS_CHOICE = (
         ('O', 'Open'),
         ('C', 'Closed'),
     )
+    status = models.CharField(max_length=1, choices=STATUS_CHOICE, default='O')
     #comments
     #user
     #assignees
-    #label
-    #milestone
+    label = models.ManyToManyField(Label)
+    milestone = models.ManyToManyField(Milestone)
 
-    def __str__(self):
-        return self.title + ' ' + self.text
+
+

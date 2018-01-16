@@ -16,6 +16,7 @@ textarea {
 }
 .panel-white {
   border: 1px solid #dddddd;
+  width: 90%;
 }
 .panel-white  .panel-heading {
   color: #333;
@@ -56,6 +57,7 @@ textarea {
 }
 .post .post-description {
   padding: 15px;
+  padding-top: 0px;
 }
 .post .post-description p {
   font-size: 14px;
@@ -113,4 +115,10 @@ textarea {
 }
 .post .post-footer .comments-list .comment > .comments-list {
   margin-left: 50px;
+}
+.label-div{
+    height: 30px;
+    width: 70px;
+    background-color: red;
+    border-radius: 3px;
 }

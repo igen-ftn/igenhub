@@ -23,6 +23,11 @@
                     </div>
                     <h6 class="text-muted time">{{issue.date}}</h6>
                 </div>
+                {% for label in issue.label.all %}
+                <div class="col-sm-2" style="float:right">
+                    <div class="label-div"></div>
+                </div>
+                {% endfor %}
             </div>
             <div class="post-description">
                 <p> <a href="{% url 'issue_details' issue.id %}">{{issue.title}}</a>  </p>

@@ -1,11 +1,10 @@
-from django.shortcuts import render, get_object_or_404
-
+from django.shortcuts import render, get_object_or_404, get_list_or_404
 from django.http import HttpResponse
 import datetime
 
 # Create your views here.
 from .models import Example
-from .models import Issue
+from .models import *
 from .forms import IssueForm
 
 
@@ -29,21 +28,32 @@ def wiki(request):
 
 
 def issues(request):
+    #Issue.objects.all().delete()
     issues_list = Issue.objects.all()
     return render(request, 'igenapp/issues/issues.html', {'issues': issues_list})
 
 
 def new_issue(request):
-    return render(request, 'igenapp/issues/new_issue.html')
+    milestone_list = Milestone.objects.all()
+    label_list = Label.objects.all()
+    return render(request, 'igenapp/issues/new_issue.html', {'labels': label_list, 'milestones': milestone_list})
 
 
 def add_issue(request):
+    print("OVDE")
     if request.method == "POST":
         form = IssueForm(request.POST)
 
         if form.is_valid():
-            Issue.objects.create(title=form.cleaned_data['title'], text=form.cleaned_data['text'], ordinal=1,
-                                 date=datetime.datetime.now())
+            issue = Issue(title=form.cleaned_data['title'], text=form.cleaned_data['text'], ordinal=1,
+                          date=datetime.datetime.now())
+            issue.save()
+            if form.cleaned_data['milestone'] != 'null':
+                issue.milestone.add(form.cleaned_data['milestone'])
+                issue.save()
+            if form.cleaned_data['label'] != 'null':
+                issue.label.add(form.cleaned_data['label'])
+                issue.save()
     else:
         form = IssueForm()
 
