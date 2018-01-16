@@ -1,9 +1,9 @@
 from django.shortcuts import render
-
 from django.http import HttpResponse
+import requests
 
 # Create your views here.
-from igenapp.models import Example
+from .models import Example, RepositoryInfo
 
 
 def index(request):
@@ -24,6 +24,9 @@ def wiki(request):
 def issues(request):
     return render(request, 'igenapp/issues.html')
 
+
 def commits(request):
-    return render(request, 'igenapp/commits.html')
+    result = requests.get('https://api.github.com/repos/%s/%s/commits' % ('igen-ftn', 'igenhub'))
+    repo_info = RepositoryInfo('igen-ftn', 'igenhub', result.content)
+    return render(request, 'igenapp/commits.html', {'repo_info': repo_info})
 
