@@ -4,6 +4,8 @@ from django.http import HttpResponse
 from .forms import UserForm, UserEditForm
 # Create your views here.
 from igenapp.models import Example
+from django.template import RequestContext
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 
 
@@ -14,7 +16,7 @@ def insert(request, tea):
     #upis u bazu
     Example.objects.create(text=tea)
     #ispise sve upisane objekte
-    return HttpResponse(User.objects.all())
+    return HttpResponse(User.objects.get(id=1).password)
 
 def home(request):
     return render(request, 'igenapp/home.html')
@@ -33,8 +35,10 @@ def signup(request):
         form = UserForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
+            password = form.cleaned_data['password']
+            user.set_password(password)
             user.save()
-            return redirect('home')
+            return redirect('login')
         else:
             context = dict()
             context['form'] = form
@@ -50,6 +54,8 @@ def editUser(request, id):
         form = UserEditForm(request.POST, instance=user)
         if form.is_valid():
             user = form.save(commit=False)
+            password = form.cleaned_data['password']
+            user.set_password(password)
             user.save()
             context = dict()
             context['form'] = UserEditForm(instance = user)
@@ -66,5 +72,3 @@ def editUser(request, id):
         context['form'] = UserEditForm(instance=user)
         #form = UserEditForm(initial = {'first_name': user.first_name, 'last_name': user.last_name, 'username': user.username, 'email': user.email})
         return render(request, 'igenapp/user_profile.html', context)
-
-

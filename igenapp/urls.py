@@ -1,5 +1,6 @@
 from django.conf.urls import url
 from igenapp import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
                #url(r'^$', views.index, name='index'),
@@ -10,4 +11,8 @@ urlpatterns = [
     url(r'^commits/$', views.commits, name='commits'),
     url(r'^signup/$', views.signup, name='signup'),
     url(r'^users/(?P<id>\d+)/$', views.editUser, name='editUser'),
+    #temporary solution, will change to edit user after changing code
+    url(r'^accounts/profile/$', views.home, name='prof'),
+    url(r'^login/$', auth_views.login, name='login'),
+    url(r'^logout/$', auth_views.logout, name='logout'),
 ]
