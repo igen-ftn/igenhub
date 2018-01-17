@@ -1,9 +1,10 @@
 from django.shortcuts import render
 
 from django.http import HttpResponse
-
+from .forms import UserForm
 # Create your views here.
 from igenapp.models import Example
+from igenapp.models import User
 
 
 def index(request):
@@ -26,4 +27,14 @@ def issues(request):
 
 def commits(request):
     return render(request, 'igenapp/commits.html')
+
+def signup(request):
+    if request.method == "POST":
+        form = UserForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.save()
+    else:
+        form = UserForm()
+    return render(request, 'igenapp/signup.html', {'form':form})
 

@@ -8,4 +8,5 @@ urlpatterns = [
     url(r'^wiki/$', views.wiki, name='wiki'),
     url(r'^issues/$', views.issues, name='issues'),
     url(r'^commits/$', views.commits, name='commits'),
+    url(r'^signup/$', views.signup, name='signup'),
               ]
