@@ -12,7 +12,6 @@
     <div class="btn-group">
       <a href="{% url 'wikiform' %}" class="btn btn-primary">+ New Wiki Page</a>
     </div>
-    <p>Just some example text.</p>
     <div class="list-group">
       {% for wikipage in wikipages %}
       <a href="#" class="list-group-item">{{wikipage.title}}</a>
