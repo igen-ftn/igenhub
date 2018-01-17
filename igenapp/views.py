@@ -48,14 +48,14 @@ def signup(request):
         form = UserForm()
         return render(request, 'igenapp/signup.html', {'form':form})
 
-def editUser(request, id):
+def editUser(request):
+    #nacin dobavljanja korisnika iz sesije je request.user
+    user = request.user
+    print("aaaa " + str(user.id))
     if request.method == "POST":
-        user = User.objects.get(id=id)
         form = UserEditForm(request.POST, instance=user)
         if form.is_valid():
             user = form.save(commit=False)
-            password = form.cleaned_data['password']
-            user.set_password(password)
             user.save()
             context = dict()
             context['form'] = UserEditForm(instance = user)
@@ -67,7 +67,7 @@ def editUser(request, id):
             context['message'] = 'Error updating profile info. Please check input data!'
             return render(request, 'igenapp/user_profile.html', context)
     else:
-        user = User.objects.get(id=id)
+        user = request.user
         context = dict()
         context['form'] = UserEditForm(instance=user)
         #form = UserEditForm(initial = {'first_name': user.first_name, 'last_name': user.last_name, 'username': user.username, 'email': user.email})

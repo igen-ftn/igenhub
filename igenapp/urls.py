@@ -10,9 +10,7 @@ urlpatterns = [
     url(r'^issues/$', views.issues, name='issues'),
     url(r'^commits/$', views.commits, name='commits'),
     url(r'^signup/$', views.signup, name='signup'),
-    url(r'^users/(?P<id>\d+)/$', views.editUser, name='editUser'),
-    #temporary solution, will change to edit user after changing code
-    url(r'^accounts/profile/$', views.home, name='prof'),
+    url(r'^accounts/profile/$', views.editUser, name='editUser'),
     url(r'^login/$', auth_views.login, name='login'),
     url(r'^logout/$', views.logout_view, name='logout'),
 ]
