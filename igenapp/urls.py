@@ -14,5 +14,5 @@ urlpatterns = [
     #temporary solution, will change to edit user after changing code
     url(r'^accounts/profile/$', views.home, name='prof'),
     url(r'^login/$', auth_views.login, name='login'),
-    url(r'^logout/$', auth_views.logout, name='logout'),
+    url(r'^logout/$', views.logout_view, name='logout'),
 ]

@@ -72,3 +72,7 @@ def editUser(request, id):
         context['form'] = UserEditForm(instance=user)
         #form = UserEditForm(initial = {'first_name': user.first_name, 'last_name': user.last_name, 'username': user.username, 'email': user.email})
         return render(request, 'igenapp/user_profile.html', context)
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')
