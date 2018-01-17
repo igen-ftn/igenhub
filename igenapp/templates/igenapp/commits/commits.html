@@ -14,7 +14,7 @@
         <form method="post" action="{% url 'selected_branch' %}">
             <select id="selectedBranch" name="milestone" style="width:150px;">
             {% for branch in repo_info.branches %}
-            <option value="{{branch.commit.sha}}"
+            <option value="{{branch.name}}"
                 {% if branch.name == repo_info.selected_branch %}selected="selected"{% endif %}>
                 {{branch.name}}
             </option>
@@ -24,7 +24,7 @@
     </div>
 </div>
 <br /><br />
-<div class="row">
+<div id="commitsContent" class="row">
     {% for commitInfo in repo_info.commits %}
     <div class="col-sm-8">
         <div class="panel panel-white post panel-shadow">
@@ -33,7 +33,7 @@
                     <img src="http://bootdey.com/img/Content/user_1.jpg" class="img-circle avatar1" alt="user profile image">
                 </div>
                 <div class="pull-left meta">
-                    <div class="title mt">
+                    <div class="title mt" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;max-width: 520px;">
                         <a href="{% url 'commit' commitInfo.sha %}">{{commitInfo.commit.message}}</a>
                     </div>
                     <h6 class="text-muted time">Committed by: <b>{{commitInfo.commit.author.name}}</b></h6>

@@ -85,14 +85,13 @@ def commit(request, commit_id):
     commit['allAdditions'] = sum([file['additions'] for file in commit['files']])
     commit['allDeletions'] = sum([file['deletions'] for file in commit['files']])
 
-    return render(request, 'igenapp/commits/commit.html', {'commit': commit})
+    return render(request, 'igenapp/commits/commit.html', {'commit': commit, 'owner_name': 'igen-ftn', 'repo_name': 'igenhub'})
 
 
 def selected_branch(request):
     branch = request.GET.get('branch')
-    print(branch)
-    result = requests.get('https://api.github.com/repos/%s/%s/commits/%s' % ('igen-ftn', 'igenhub', 'issues'))
+    result = requests.get('https://api.github.com/repos/%s/%s/commits?sha=%s' % ('igen-ftn', 'igenhub', branch))
     commits = json.loads(result.content)
-    print(commits)
-    return JsonResponse(commits)
+
+    return JsonResponse(commits, safe=False)
 
