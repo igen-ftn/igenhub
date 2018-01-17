@@ -7,7 +7,7 @@ $(function() {
         },
         dataType: 'json',
         success: function (data) {
-            console.log("asdasdasdasdasdasd");
+            console.log("Commits");
         }
         });
     });

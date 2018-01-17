@@ -14,7 +14,10 @@
         <form method="post" action="{% url 'selected_branch' %}">
             <select id="selectedBranch" name="milestone" style="width:150px;">
             {% for branch in repo_info.branches %}
-            <option value="{{branch.commit.sha}}">{{branch.name}}</option>
+            <option value="{{branch.commit.sha}}"
+                {% if branch.name == repo_info.selected_branch %}selected="selected"{% endif %}>
+                {{branch.name}}
+            </option>
             {% endfor %}
         </select>
         </form>
@@ -31,15 +34,13 @@
                 </div>
                 <div class="pull-left meta">
                     <div class="title mt">
-                        <a href="#">{{commitInfo.commit.message}}</a>
+                        <a href="{% url 'commit' commitInfo.sha %}">{{commitInfo.commit.message}}</a>
                     </div>
                     <h6 class="text-muted time">Committed by: <b>{{commitInfo.commit.author.name}}</b></h6>
                 </div>
-
                 <div class="col-sm-2" style="float:right; width: 55px;">
-                    <a href="#" class="btn btn-success btn-circle text-uppercase"><span class="glyphicon glyphicon-th-large"></span></a>
+                    <a href="{% url 'commit' commitInfo.sha %}" class="btn btn-success btn-circle text-uppercase"><span class="glyphicon glyphicon-th-large"></span></a>
                 </div>
-
             </div>
         </div>
     </div>

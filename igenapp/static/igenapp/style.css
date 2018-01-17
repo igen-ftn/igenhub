@@ -18,6 +18,9 @@ textarea {
   border: 1px solid #dddddd;
   width: 90%;
 }
+.panel-all {
+  width: 100%;
+}
 .panel-white  .panel-heading {
   color: #333;
   background-color: #fff;
