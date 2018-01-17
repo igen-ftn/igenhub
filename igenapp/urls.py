@@ -1,5 +1,6 @@
 from django.conf.urls import url
 from igenapp import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
                #url(r'^$', views.index, name='index'),
@@ -12,5 +13,10 @@ urlpatterns = [
     url(r'^(?P<issue_id>\d+)/$', views.issue_details, name='issue_details'),
     url(r'^commits/$', views.commits, name='commits'),
     url(r'^commit/(?P<commit_id>\w+)/$', views.commit, name='commit'),
-    url(r'^selected_branch/$', views.selected_branch, name='selected_branch')
+    url(r'^selected_branch/$', views.selected_branch, name='selected_branch'),
+    url(r'^signup/$', views.signup, name='signup'),
+    url(r'^accounts/profile/$', views.editUser, name='editUser'),
+    url(r'^login/$', auth_views.login, name='login'),
+    url(r'^logout/$', views.logout_view, name='logout')
               ]
+

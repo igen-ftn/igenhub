@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <title>Sign up</title>
+{% endblock %}
+
+{% block body %}
+    <h3>Sign Up:</h3>
+    <p>{{message}}</p>
+    <form method = "POST" class="post-form">
+        {% csrf_token %}
+        {{ form.management_form}}
+        {{form.errors}}
+        {{form.non_field_errors}}
+        {{form.non_form_errors}}
+        <br/>
+        <table>
+            {{ form.as_table }}
+            <tr>
+                <td>
+                    &nbsp;
+                </td>
+                <td>
+                    <button type="submit" class="save btn btn-sm btn-primary pull-right">Sign up</button>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+{% endblock %}

@@ -63,4 +63,3 @@ class Issue(models.Model):
     #assignees
     label = models.ManyToManyField(Label)
     milestone = models.ManyToManyField(Milestone)
-
