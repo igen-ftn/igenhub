@@ -1,6 +1,6 @@
 from django import forms
 
-from igenapp.models import User
+from django.contrib.auth.models import User
 
 
 class UserForm(forms.ModelForm):
@@ -9,5 +9,12 @@ class UserForm(forms.ModelForm):
     username = forms.CharField()
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ['username', 'email', 'password', 'first_name', 'last_name']
+
+class UserEditForm(forms.ModelForm):
+    email = forms.CharField(widget = forms.EmailInput)
+    username = forms.CharField()
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'first_name', 'last_name']
 

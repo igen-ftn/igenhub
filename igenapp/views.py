@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect
 
 from django.http import HttpResponse
-from .forms import UserForm
+from .forms import UserForm, UserEditForm
 # Create your views here.
 from igenapp.models import Example
-from igenapp.models import User
+from django.contrib.auth.models import User
 
 
 def index(request):
@@ -41,18 +41,20 @@ def signup(request):
 
 def users(request, id):
     if request.method == "POST":
-        form = UserForm(request.POST)
+        user = User.objects.get(id=id)
+        form = UserEditForm(request.POST, instance=user)
+        print(form)
         if form.is_valid():
             user = form.save(commit=False)
-            user.id = id
+            #user.id = id
             user.save()
             return redirect('home')
         else:
             print("neuspeo update")
     else:
         user = User.objects.get(id=id)
-
-        form = UserForm(initial = {'id': user.id, 'first_Name': user.first_Name, 'last_Name': user.last_Name, 'username': user.username, 'password': user.password, 'email': user.email})
+        form = UserEditForm(instance = user)
+        #form = UserEditForm(initial = {'first_name': user.first_name, 'last_name': user.last_name, 'username': user.username, 'email': user.email})
         return render(request, 'igenapp/user_profile.html', {'form':form})
 
 
