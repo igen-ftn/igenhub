@@ -11,5 +11,6 @@ urlpatterns = [
     url(r'^add_issue/$', views.add_issue, name='add_issue'),
     url(r'^(?P<issue_id>\d+)/$', views.issue_details, name='issue_details'),
     url(r'^commits/$', views.commits, name='commits'),
+    url(r'^commit/(?P<commit_id>\w+)/$', views.commit, name='commit'),
     url(r'^selected_branch/$', views.selected_branch, name='selected_branch')
               ]
