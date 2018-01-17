@@ -3,7 +3,7 @@
 <h1>{{issue.title}}</h1>
 <br/>
 <div>
-    <form class="form-horizontal" action="{% url 'add_issue' %}" method="post">{% csrf_token %}
+    <form class="form-horizontal" action="{% url 'new_issue' issue.id  %}" method="post">{% csrf_token %}
       <div class="form-group">
             <label class="col-sm-2 control-label" style="text-align:left; width:100px;">Title:</label>
             <div class="col-sm-10">

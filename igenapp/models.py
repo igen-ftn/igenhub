@@ -43,7 +43,7 @@ class Issue(models.Model):
     title = models.CharField(max_length=100)
     text = models.CharField(max_length=500)
     ordinal = models.IntegerField()
-    date = models.DateField()
+    date = models.DateTimeField()
     STATUS_CHOICE = (
         ('O', 'Open'),
         ('C', 'Closed'),
