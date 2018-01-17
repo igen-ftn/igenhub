@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, render_to_response
 
 from django.http import HttpResponse
 from .forms import UserForm, UserEditForm
@@ -35,26 +35,36 @@ def signup(request):
             user = form.save(commit=False)
             user.save()
             return redirect('home')
+        else:
+            context = dict()
+            context['form'] = form
+            context['message'] = "Error has occured:"
+            return render(request, 'igenapp/signup.html', context)
     else:
         form = UserForm()
         return render(request, 'igenapp/signup.html', {'form':form})
 
-def users(request, id):
+def editUser(request, id):
     if request.method == "POST":
         user = User.objects.get(id=id)
         form = UserEditForm(request.POST, instance=user)
-        print(form)
         if form.is_valid():
             user = form.save(commit=False)
-            #user.id = id
             user.save()
-            return redirect('home')
+            context = dict()
+            context['form'] = UserEditForm(instance = user)
+            context['message'] = 'Your profile has been successfully updated!'
+            return render(request, 'igenapp/user_profile.html', context)
         else:
-            print("neuspeo update")
+            context = dict()
+            context['form'] = form
+            context['message'] = 'Error updating profile info. Please check input data!'
+            return render(request, 'igenapp/user_profile.html', context)
     else:
         user = User.objects.get(id=id)
-        form = UserEditForm(instance = user)
+        context = dict()
+        context['form'] = UserEditForm(instance=user)
         #form = UserEditForm(initial = {'first_name': user.first_name, 'last_name': user.last_name, 'username': user.username, 'email': user.email})
-        return render(request, 'igenapp/user_profile.html', {'form':form})
+        return render(request, 'igenapp/user_profile.html', context)
 
 
