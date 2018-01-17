@@ -10,6 +10,15 @@ class Example(models.Model):
         return self.text
 
 
+class RepositoryInfo:
+    def __init__(self, owner_name, repo_name, branches, commits, selected_branch='master'):
+        self.owner_name = owner_name
+        self.repo_name = repo_name
+        self.branches = branches
+        self.commits = commits
+        self.selected_branch = selected_branch
+
+
 class Label(models.Model):
 
     id = models.AutoField(primary_key=True)

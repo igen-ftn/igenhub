@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<h1>Commit</h1>
+<label>Repository: {{repo_name}} | Owner: {{owner_name}}</label>
+<br /><br />
+<div class="row">
+    <div class="col-sm-12">
+        <div class="panel panel-white1 panel-all post panel-shadow">
+            <div class="post-heading1">
+                <div class="pull-left image">
+                    <img src="http://bootdey.com/img/Content/user_1.jpg" class="img-circle avatar1" alt="user profile image">
+                </div>
+                <div class="pull-left meta">
+                    <div class="title mt">
+                        <a href="#">{{commit.commit.message}}</a>
+                    </div>
+                    <h6 class="text-muted time">Committed by: <b>{{commit.commit.author.name}}</b></h6>
+                </div>
+
+                <div class="col-sm-2 text-muted time mt" style="float:right; width: 149px; font-size: 13px;">
+                    <span class="">{{commit.commit.author.date}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<label>
+    <span style="font-weight: normal;">Changes:</span>
+    {{commit.files|length}} changed {% if commit.files|length > 1 %}files{% else %}file{% endif %} |
+    <span style="font-weight: normal;">Additions:</span>
+    {{commit.allAdditions}} |
+    <span style="font-weight: normal;">Deletions:</span>
+    {{commit.allDeletions}}
+</label>
+<br /><br />
+<div class="row">
+    {% for file in commit.files %}
+    <div class="col-sm-12">
+        <div class="panel panel-white panel-all post panel-shadow">
+            <div class="post-heading1" style="height: auto;">
+                <div class="pull-left meta">
+                    <div class="title mt">
+                        <span class="text-muted">
+                            {{file.additions}}
+                            additions,
+                            {{file.deletions}}
+                            deletions |
+                            file name:
+                            {{file.filename}}
+                        </span>
+                    </div>
+                </div><br />
+                <hr style="margin-top: 10px">
+                <div>
+                    <textarea rows="15" readonly="readonly" style="padding:0px 10px;background-color:#ccc;border:none;width:100%;font-size:12px;">
+                        {{file.patch}}
+                    </textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

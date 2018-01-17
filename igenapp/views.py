@@ -1,8 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
-import datetime
+from django.http import HttpResponse, JsonResponse
 
-from .forms import *
+import datetime
+import requests
+import simplejson as json
+
 from .models import *
+from .forms import *
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -84,7 +88,34 @@ def issue_details(request, issue_id):
 
 
 def commits(request):
-    return render(request, 'igenapp/commits.html')
+    result = requests.get('https://api.github.com/repos/%s/%s/commits' % ('igen-ftn', 'igenhub'))
+    commits = json.loads(result.content)
+
+    result = requests.get('https://api.github.com/repos/%s/%s/branches' % ('igen-ftn', 'igenhub'))
+    branches = json.loads(result.content)
+
+    repo_info = RepositoryInfo('igen-ftn', 'igenhub', branches, commits)
+
+    return render(request, 'igenapp/commits/commits.html', {'repo_info': repo_info})
+
+
+def commit(request, commit_id):
+    result = requests.get('https://api.github.com/repos/%s/%s/commits/%s' % ('igen-ftn', 'igenhub', commit_id))
+    commit = json.loads(result.content)
+    commit['commit']['author']['date'] = commit['commit']['author']['date'].replace('T', ' ')[:-1]
+    commit['allAdditions'] = sum([file['additions'] for file in commit['files']])
+    commit['allDeletions'] = sum([file['deletions'] for file in commit['files']])
+
+    return render(request, 'igenapp/commits/commit.html', {'commit': commit, 'owner_name': 'igen-ftn', 'repo_name': 'igenhub'})
+
+
+def selected_branch(request):
+    branch = request.GET.get('branch')
+    result = requests.get('https://api.github.com/repos/%s/%s/commits?sha=%s' % ('igen-ftn', 'igenhub', branch))
+    commits = json.loads(result.content)
+
+    return JsonResponse(commits, safe=False)
+
 
 
 def signup(request):
