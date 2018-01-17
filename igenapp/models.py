@@ -11,11 +11,11 @@ class Example(models.Model):
 
 class User(models.Model):
     id = models.AutoField(primary_key=True)
-    first_Name = models.CharField(max_length=30)
-    last_Name = models.CharField(max_length=30)
-    username = models.CharField(max_length=40)
-    password = models.CharField(max_length=40)
-    email = models.CharField(max_length = 80)
+    first_Name = models.CharField(max_length=30, null = True)
+    last_Name = models.CharField(max_length=30, null = True)
+    username = models.CharField(max_length=40, default = "username")
+    password = models.CharField(max_length=40, default = "password")
+    email = models.CharField(max_length = 80, default="somebody@example.com")
 
     def __str__(self):
-        return self.username
+        return str(self.password) + self.username

@@ -9,4 +9,5 @@ urlpatterns = [
     url(r'^issues/$', views.issues, name='issues'),
     url(r'^commits/$', views.commits, name='commits'),
     url(r'^signup/$', views.signup, name='signup'),
-              ]
+    url(r'^users/(?P<id>\d+)/$', views.users, name='users'),
+]
