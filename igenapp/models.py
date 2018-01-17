@@ -3,13 +3,6 @@ from django.db import models
 # Create your models here.
 
 
-class Example(models.Model):
-    text = models.CharField(max_length=200)
-
-    def __str__(self):
-        return self.text
-
-
 class Label(models.Model):
 
     id = models.AutoField(primary_key=True)
@@ -54,6 +47,3 @@ class Issue(models.Model):
     #assignees
     label = models.ManyToManyField(Label)
     milestone = models.ForeignKey(Milestone, default=None, blank=True, null=True)
-
-
-
