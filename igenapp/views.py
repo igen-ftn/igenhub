@@ -1,24 +1,15 @@
-from django.shortcuts import render, redirect, render_to_response, get_object_or_404
-from django.http import HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
 import datetime
 
 from .forms import *
 from .models import *
 
-from django.template import RequestContext
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 
 
 def index(request):
     return render(request, 'igenapp/index.html')
-
-
-def insert(request, tea):
-    #upis u bazu
-    Example.objects.create(text=tea)
-    #ispise sve upisane objekte
-    return HttpResponse(User.objects.get(id=1).password)
 
 
 def home(request):
@@ -31,6 +22,7 @@ def wiki(request):
 
 def issues(request):
     #######################
+    #User.objects.all().delete()
     #Issue.objects.all().delete()
     # Milestone.objects.all().delete()
     # Label.objects.all().delete()
@@ -45,12 +37,14 @@ def issues(request):
 def new_issue(request, issue_id):
     milestone_list = Milestone.objects.all()
     label_list = Label.objects.all()
+    users = User.objects.all()
     try:
         issue = Issue.objects.get(pk=issue_id)
         return render(request, 'igenapp/issues/new_issue.html', {'labels': label_list, 'milestones': milestone_list,
-                                                                 'issue': issue})
+                                                                 'issue': issue, 'users': users})
     except Issue.DoesNotExist:
-        return render(request, 'igenapp/issues/new_issue.html', {'labels': label_list, 'milestones': milestone_list})
+        return render(request, 'igenapp/issues/new_issue.html', {'labels': label_list, 'milestones': milestone_list,
+                                                                 'users': users})
 
 
 def add_issue(request, issue_id):
@@ -65,7 +59,8 @@ def add_issue(request, issue_id):
                     issue.milestone = None
                     issue.save()
             else:
-                issue = Issue(title=form.cleaned_data['title'], text=form.cleaned_data['text'], ordinal=1, date=datetime.datetime.now())
+                issue = Issue(title=form.cleaned_data['title'], text=form.cleaned_data['text'], ordinal=1,
+                              date=datetime.datetime.now())
                 issue.save()
             if form.cleaned_data['milestone'] != 'null':
                 milestone = get_object_or_404(Milestone, pk=form.cleaned_data['milestone'])
