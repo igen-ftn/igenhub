@@ -9,3 +9,7 @@ class Example(models.Model):
         return self.text
 
 
+class WikiPage(models.Model):
+    id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=100)
+    content = models.CharField(max_length=1000)

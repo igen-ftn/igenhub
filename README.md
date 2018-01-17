@@ -12,7 +12,7 @@ PostgreSQL
 
 ## run the application
 
-(sudo) docker-compose run web python3 manage.py makemigration
+(sudo) docker-compose run web python3 manage.py makemigrations
 docker-compose up
 if it does not work then:
 

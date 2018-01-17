@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+
+{% block body %}
+<h1>Wiki Form</h1>
+<p>Just some example text.</p>
+<form method = "POST" class="form-horizontal">
+    {% csrf_token %}
+    <div class="col-md-12">
+      {{ form.title }}
+    </div>
+    <br/>
+    <div class="col-md-12">
+      {{ form.content }}
+    </div>
+    <br/>
+    <br/>
+    <button type="submit" class="save btn btn-md btn-primary">Save</button>
+</form>
+{% endblock %}

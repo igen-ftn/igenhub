@@ -7,6 +7,7 @@ urlpatterns = [
                #url(r'(?P<tea>\w+)/$', views.insert, name='insert'),
     url(r'^$', views.home, name='home'),
     url(r'^wiki/$', views.wiki, name='wiki'),
+    url(r'^wiki-form/$', views.wiki_form, name='wikiform'),
     url(r'^issues/$', views.issues, name='issues'),
     url(r'^commits/$', views.commits, name='commits'),
     url(r'^signup/$', views.signup, name='signup'),

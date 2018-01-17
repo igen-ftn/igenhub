@@ -1,6 +1,7 @@
 from django import forms
 
 from django.contrib.auth.models import User
+from .models import *
 
 
 class UserForm(forms.ModelForm):
@@ -18,5 +19,13 @@ class UserEditForm(forms.ModelForm):
         model = User
         fields = ['username', 'email', 'first_name', 'last_name']
 
+
+class WikiForm(forms.ModelForm):
+    title = forms.CharField()
+    content = forms.CharField(widget=forms.Textarea)
+
+    class Meta:
+        model = WikiPage
+        fields = '__all__'
 
 

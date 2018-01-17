@@ -9,6 +9,9 @@
   <body>
     {% block body %}
     <h1>Wiki</h1>
+    <div class="btn-group">
+      <a href="{% url 'wikiform' %}" class="btn btn-primary">+ New Wiki Page</a>
+    </div>
     <p>Just some example text.</p>
     {% endblock %}
   </body>

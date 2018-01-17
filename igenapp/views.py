@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect, render_to_response
 
 from django.http import HttpResponse
-from .forms import UserForm, UserEditForm
+from .forms import UserForm, UserEditForm, WikiForm
 # Create your views here.
 from igenapp.models import Example
 from django.template import RequestContext
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from .models import *
 
 
 def index(request):
@@ -21,8 +22,27 @@ def insert(request, tea):
 def home(request):
     return render(request, 'igenapp/home.html')
 
+
 def wiki(request):
-    return render(request, 'igenapp/wiki.html')
+    wikipages_list = WikiPage.objects.all()
+    return render(request, 'igenapp/wiki.html', {'wikipages': wikipages_list})
+    #return render(request, 'igenapp/wiki.html')
+
+
+def wiki_form(request):
+    if request.method == "POST":
+        form = WikiForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('wiki')
+        else:
+            context = dict()
+            context['form'] = form
+            context['message'] = "Error has occured:"
+            return render(request, 'igenapp/wiki/form.html', context)
+    else:
+        form = WikiForm()
+        return render(request, 'igenapp/wiki/form.html', {'form': form})
 
 def issues(request):
     return render(request, 'igenapp/issues.html')
