@@ -42,7 +42,7 @@ def signup(request):
         else:
             context = dict()
             context['form'] = form
-            context['message'] = "Error has occured:"
+            context['message'] = "Error has occured"
             return render(request, 'igenapp/signup.html', context)
     else:
         form = UserForm()
