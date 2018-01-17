@@ -3,7 +3,7 @@
 <h1>{{issue.title}}</h1>
 <br/>
 <div>
-    <form class="form-horizontal">
+    <form class="form-horizontal" action="{% url 'add_issue' %}" method="post">{% csrf_token %}
       <div class="form-group">
             <label class="col-sm-2 control-label" style="text-align:left; width:100px;">Title:</label>
             <div class="col-sm-10">
@@ -14,6 +14,18 @@
             <label class="col-sm-2 control-label" style="text-align:left; width:100px;">Comment</label>
             <div class="col-sm-10">
               <textarea class="form-control" rows="8" style="width:70%" disabled>{{issue.text}}</textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label" style="text-align:left; width:100px;">Milestone:</label>
+            <div class="col-sm-2">
+                <input type="text" class="form-control" style="width:70%" value="{{issue.milestone.title}}" disabled>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label" style="text-align:left; width:100px;">Label:</label>
+            <div class="col-sm-2">
+                <input type="text" class="form-control" style="width:70%" value="{{issue.label.all.0.name}}" disabled>
             </div>
         </div>
         <div class="form-group">

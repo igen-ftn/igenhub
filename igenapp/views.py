@@ -28,7 +28,14 @@ def wiki(request):
 
 
 def issues(request):
-    #Issue.objects.all().delete()
+    #######################
+    Issue.objects.all().delete()
+    Milestone.objects.all().delete()
+    Label.objects.all().delete()
+    Label.objects.create(name='bug', color='R')
+    Label.objects.create(name='feature', color='Y')
+    Milestone.objects.create(title='Milestone 1', description='This is first milestone', creation_date=datetime.datetime.now())
+    ###########################
     issues_list = Issue.objects.all()
     return render(request, 'igenapp/issues/issues.html', {'issues': issues_list})
 
@@ -40,7 +47,6 @@ def new_issue(request):
 
 
 def add_issue(request):
-    print("OVDE")
     if request.method == "POST":
         form = IssueForm(request.POST)
 
@@ -49,7 +55,8 @@ def add_issue(request):
                           date=datetime.datetime.now())
             issue.save()
             if form.cleaned_data['milestone'] != 'null':
-                issue.milestone.add(form.cleaned_data['milestone'])
+                milestone = get_object_or_404(Milestone, pk=form.cleaned_data['milestone'])
+                issue.milestone = milestone
                 issue.save()
             if form.cleaned_data['label'] != 'null':
                 issue.label.add(form.cleaned_data['label'])

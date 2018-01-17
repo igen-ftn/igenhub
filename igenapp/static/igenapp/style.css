@@ -117,8 +117,13 @@ textarea {
   margin-left: 50px;
 }
 .label-div{
-    height: 30px;
-    width: 70px;
+    height: 25px;
+    width: 80px;
+    padding: 3px;
+    text-align: center;
+    color: white;
     background-color: red;
     border-radius: 3px;
+    border: 1px solid #dddddd;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 }

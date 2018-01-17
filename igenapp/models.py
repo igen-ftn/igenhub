@@ -15,10 +15,10 @@ class Label(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=20)
     COLOR_CHOICE = (
-        ('R', 'RED'),
-        ('B', 'BLUE'),
-        ('Y', 'YELLOW'),
-        ('G', 'GREEN'),
+        ('R', '#ee0701'),
+        ('B', '#84b6eb'),
+        ('Y', '#fbca04'),
+        ('G', '#33aa3f'),
     )
     color = models.CharField(max_length=1, choices=COLOR_CHOICE)
 
@@ -29,12 +29,12 @@ class Milestone(models.Model):
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=500)
     creation_date = models.DateField()
-    due_date = models.DateField()
+    due_date = models.DateField(default=None, blank=True, null=True)
     STATUS_CHOICE = (
         ('O', 'Open'),
         ('C', 'Closed'),
     )
-    status = models.CharField(max_length=1, choices=STATUS_CHOICE)
+    status = models.CharField(max_length=1, choices=STATUS_CHOICE, default='O')
 
 
 class Issue(models.Model):
@@ -53,7 +53,7 @@ class Issue(models.Model):
     #user
     #assignees
     label = models.ManyToManyField(Label)
-    milestone = models.ManyToManyField(Milestone)
+    milestone = models.ForeignKey(Milestone, default=None, blank=True, null=True)
 
 
 
