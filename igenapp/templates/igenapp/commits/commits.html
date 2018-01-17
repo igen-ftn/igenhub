@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block head %}
+{% load staticfiles %}
+<script src="{% static 'igenapp/commit.js' %}"></script>
+{% endblock%}
+
+{% block body %}
+<h1>Commits</h1>
+<label>Repository: {{repo_info.repo_name}} | Owner: {{repo_info.owner_name}}</label>
+<br /><br />
+<div style="display: ruby;">
+    <label class="">Branch:</label>
+    <div class="">
+        <form method="post" action="{% url 'selected_branch' %}">
+            <select id="selectedBranch" name="milestone" style="width:150px;">
+            {% for branch in repo_info.branches %}
+            <option value="{{branch.commit.sha}}">{{branch.name}}</option>
+            {% endfor %}
+        </select>
+        </form>
+    </div>
+</div>
+<br /><br />
+<div class="row">
+    {% for commitInfo in repo_info.commits %}
+    <div class="col-sm-8">
+        <div class="panel panel-white post panel-shadow">
+            <div class="post-heading1">
+                <div class="pull-left image">
+                    <img src="http://bootdey.com/img/Content/user_1.jpg" class="img-circle avatar1" alt="user profile image">
+                </div>
+                <div class="pull-left meta">
+                    <div class="title mt">
+                        <a href="#">{{commitInfo.commit.message}}</a>
+                    </div>
+                    <h6 class="text-muted time">Committed by: <b>{{commitInfo.commit.author.name}}</b></h6>
+                </div>
+
+                <div class="col-sm-2" style="float:right; width: 55px;">
+                    <a href="#" class="btn btn-success btn-circle text-uppercase"><span class="glyphicon glyphicon-th-large"></span></a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
