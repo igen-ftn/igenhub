@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block body %}
+<h1>Issues</h1>
+<br/>
+<div class="row">
+    <div class="col-sm-10">
+        <a href="{% url 'new_issue' 0 %}" class="btn btn-success btn-circle text-uppercase"><span class="glyphicon glyphicon-plus-sign"></span> New Issue</a>
+    </div>
+</div>
+<br/>
+<div class="row">
+    {% for issue in issues %}
+    <div class="col-sm-8">
+        <div class="panel panel-white post panel-shadow">
+            <div class="post-heading">
+                <div class="pull-left image">
+                    <img src="http://bootdey.com/img/Content/user_1.jpg" class="img-circle avatar" alt="user profile image">
+                </div>
+                <div class="pull-left meta">
+                    <div class="title h5">
+                        <a href="#"><b>Ryan Haywood</b></a>
+                        created issue.
+                    </div>
+                    <h6 class="text-muted time">{{issue.date}}</h6>
+                </div>
+                {% for label in issue.label.all %}
+                <div class="col-sm-2" style="float:right">
+                    <div class="label-div " style="background-color: {{label.get_color_display}}"><span class="glyphicon glyphicon-tag"></span> {{label.name}}</div>
+                </div>
+                {% endfor %}
+                <br/><br/>
+                {% if issue.milestone %}
+                <div class="col-sm-2" style="float:right">
+                    <div style="width:200px;"><span class="glyphicon glyphicon-pushpin"></span> {{issue.milestone.title}}</div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="post-description">
+                <p> <a href="{% url 'issue_details' issue.id %}">{{issue.title}}</a>  </p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock body %}
