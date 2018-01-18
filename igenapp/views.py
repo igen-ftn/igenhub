@@ -8,6 +8,8 @@ import simplejson as json
 from .models import *
 from .forms import *
 
+from django.template import RequestContext
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 
@@ -21,7 +23,25 @@ def home(request):
 
 
 def wiki(request):
-    return render(request, 'igenapp/wiki.html')
+    wikipages_list = WikiPage.objects.all()
+    return render(request, 'igenapp/wiki.html', {'wikipages': wikipages_list})
+    #return render(request, 'igenapp/wiki.html')
+
+
+def wiki_form(request):
+    if request.method == "POST":
+        form = WikiForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('wiki')
+        else:
+            context = dict()
+            context['form'] = form
+            context['message'] = "Error has occured:"
+            return render(request, 'igenapp/wiki/form.html', context)
+    else:
+        form = WikiForm()
+        return render(request, 'igenapp/wiki/form.html', {'form': form})
 
 
 def issues(request):

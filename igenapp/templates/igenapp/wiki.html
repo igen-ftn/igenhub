@@ -9,7 +9,21 @@
   <body>
     {% block body %}
     <h1>Wiki</h1>
-    <p>Just some example text.</p>
+
+    <div class="row">
+      <div class="btn-group">
+        <a href="{% url 'wikiform' %}" class="btn btn-primary">+ New Wiki Page</a>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="list-group">
+        {% for wikipage in wikipages %}
+        <a href="#" class="list-group-item">{{wikipage.title}}</a>
+        {% endfor %}
+      </div>
+    </div>
+    
     {% endblock %}
   </body>
 </html>
