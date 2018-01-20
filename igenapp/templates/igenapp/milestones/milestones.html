@@ -1,45 +1,59 @@
 {% extends 'base.html' %}
+
 {% block body %}
-<h1>Milestones</h1>
+<h1>New Milestone</h1>
 <br/>
-<div class="row">
-    <div class="col-sm-10">
-        <a href="#" class="btn btn-success btn-circle text-uppercase"><span class="glyphicon glyphicon-plus-sign"></span> New Issue</a>
-    </div>
-</div>
-<br/>
-<div class="row">
-    {% for issue in issues %}
-    <div class="col-sm-8">
-        <div class="panel panel-white post panel-shadow">
-            <div class="post-heading">
-                <div class="pull-left image">
-                    <img src="http://bootdey.com/img/Content/user_1.jpg" class="img-circle avatar" alt="user profile image">
-                </div>
-                <div class="pull-left meta">
-                    <div class="title h5">
-                        <a href="#"><b>Ryan Haywood</b></a>
-                        created issue.
-                    </div>
-                    <h6 class="text-muted time">{{issue.date}}</h6>
-                </div>
-                {% for label in issue.label.all %}
-                <div class="col-sm-2" style="float:right">
-                    <div class="label-div " style="background-color: {{label.get_color_display}}"><span class="glyphicon glyphicon-tag"></span> {{label.name}}</div>
-                </div>
-                {% endfor %}
-                <br/><br/>
-                {% if issue.milestone %}
-                <div class="col-sm-2" style="float:right">
-                    <div style="width:200px;"><span class="glyphicon glyphicon-pushpin"></span> {{issue.milestone.title}}</div>
-                </div>
-                {% endif %}
-            </div>
-            <div class="post-description">
-                <p> <a href="{% url 'issue_details' issue.id %}">{{issue.title}}</a>  </p>
+<div>
+    <form class="form-horizontal" action="{% url 'add_milestone' %}" method="post">{% csrf_token %}
+        <div class="form-group">
+            <label class="col-sm-2 control-label" style="text-align:left; width:100px;">Title:</label>
+            <div class="col-sm-4">
+              <input type="text" name="title" class="form-control" style="width:70%">
             </div>
         </div>
-    </div>
-    {% endfor %}
+        <div class="form-group">
+            <label class="col-sm-2 control-label" style="text-align:left; width:100px;">Description:</label>
+            <div class="col-sm-10">
+              <textarea name="description" class="form-control" rows="8" style="width:70%"></textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label" style="text-align:left; width:100px;">Due date:</label>
+            <div class="col-sm-4">
+              <input type="date" name="due_date" class="form-control" style="width:70%">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-10" style="margin-left:100px;">
+                <button class="btn btn-success btn-circle text-uppercase"><span class="glyphicon glyphicon-send"></span>  Submit</button>
+            </div>
+        </div>
+
+    </form>
 </div>
+{% if milestones %}
+<br/>
+<h1>Milestones:</h1>
+<br/>
+<div class="col-sm-6">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Due date</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for milestone in milestones %}
+                <tr>
+                    <td>{{milestone.title}}</td>
+                    <td>{{milestone.description}}</td>
+                    <td>{{milestone.due_date}}</td>
+                </tr>
+                {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
 {% endblock body %}

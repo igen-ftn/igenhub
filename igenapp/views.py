@@ -45,15 +45,6 @@ def wiki_form(request):
 
 
 def issues(request):
-    #######################
-    #User.objects.all().delete()
-    #Issue.objects.all().delete()
-    # Milestone.objects.all().delete()
-    # Label.objects.all().delete()
-    # Label.objects.create(name='bug', color='R')
-    # Label.objects.create(name='feature', color='Y')
-    # Milestone.objects.create(title='Milestone 1', description='This is first milestone', creation_date=datetime.datetime.now())
-    ###########################
     issues_list = Issue.objects.order_by('-date')
     return render(request, 'igenapp/issues/issues.html', {'issues': issues_list})
 
@@ -112,8 +103,20 @@ def milestones(request):
     return render(request, 'igenapp/milestones/milestones.html', {'milestones': milestone_list})
 
 
-def new_milestone(request):
-    return render(request, 'igenapp/milestones/new_milestone.html')
+def add_milestone(request):
+    if request.method == "POST":
+        form = MilestoneForm(request.POST)
+        if form.is_valid():
+            due_date = request.POST.get('due_date')
+            if due_date == '':
+                due_date = None
+            Milestone.objects.create(title=form.cleaned_data['title'], description=form.cleaned_data['description'],
+                                     creation_date=datetime.datetime.now(), due_date=due_date, status='O')
+    else:
+        form = MilestoneForm()
+
+    issues_list = Issue.objects.order_by('-date')
+    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list})
 
 
 def labels(request):
