@@ -26,7 +26,7 @@
                 </div>
                 <div class="pull-left meta">
                     <div class="title h5">
-                        <a href="#"><b>Ryan Haywood</b></a>
+                        <a href="#"><b>{{issue.user}}</b></a>
                         created issue.
                     </div>
                     <h6 class="text-muted time">{{issue.date}}</h6>
@@ -45,6 +45,12 @@
             </div>
             <div class="post-description">
                 <p> <a href="{% url 'issue_details' issue.id %}">{{issue.title}}</a>  </p>
+                {% if issue.assignee.all %}
+                <p> <b>Assignees:</b>
+                    {% for user in issue.assignee.all %}
+                        {{ user }} {% if forloop.last == False %} , {% endif %}
+                    {% endfor %} </p>
+                {% endif %}
             </div>
         </div>
     </div>

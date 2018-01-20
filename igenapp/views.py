@@ -68,14 +68,14 @@ def add_issue(request, issue_id):
         if form.is_valid():
             if int(issue_id) != 0:
                 Issue.objects.filter(pk=issue_id).update(title=form.cleaned_data['title'],
-                                      text=form.cleaned_data['text'], ordinal=1)
+                                                         text=form.cleaned_data['text'], ordinal=1, status='O')
                 issue = get_object_or_404(Issue, pk=issue_id)
                 if form.cleaned_data['milestone'] == 'null':
                     issue.milestone = None
                     issue.save()
             else:
                 issue = Issue(title=form.cleaned_data['title'], text=form.cleaned_data['text'], ordinal=1,
-                              date=datetime.datetime.now())
+                              date=datetime.datetime.now(), status='O', user=request.user)
                 issue.save()
             if form.cleaned_data['milestone'] != 'null':
                 milestone = get_object_or_404(Milestone, pk=form.cleaned_data['milestone'])
@@ -85,6 +85,10 @@ def add_issue(request, issue_id):
             issue.label.clear()
             for label in labels:
                 issue.label.add(label)
+            assignees = request.POST.getlist('assignees')
+            issue.assignee.clear()
+            for assignee in assignees:
+                issue.assignee.add(assignee)
             issue.save()
     else:
         form = IssueForm()
@@ -115,8 +119,8 @@ def add_milestone(request):
     else:
         form = MilestoneForm()
 
-    issues_list = Issue.objects.order_by('-date')
-    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list})
+    milestone_list = Milestone.objects.all()
+    return render(request, 'igenapp/milestones/milestones.html', {'milestones': milestone_list})
 
 
 def remove_milestone(request, milestone_id):
@@ -138,8 +142,8 @@ def add_label(request):
     else:
         form = LabelForm()
 
-    issues_list = Issue.objects.order_by('-date')
-    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list})
+    label_list = Label.objects.all()
+    return render(request, 'igenapp/labels/labels.html', {'labels': label_list})
 
 
 def remove_label(request, label_id):

@@ -65,7 +65,8 @@
             <div class="col-sm-2">
                 <select name="assignees" multiple="multiple" style="width: 150px;">
                     {% for user in users %}
-                    <option value="{{user.id}}">
+                    <option value="{{user.id}}"
+                        {% if user in issue.assignee.all %} selected='selected' {% endif %}>
                         {{user.username}}
                     </option>
                     {% endfor %}

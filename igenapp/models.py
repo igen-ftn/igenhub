@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -53,8 +54,8 @@ class Issue(models.Model):
     )
     status = models.CharField(max_length=1, choices=STATUS_CHOICE, default='O')
     #comments
-    #user = models.ForeignKey(User)
-    #assignee = models.OneToOneField(User)
+    user = models.ForeignKey(User)
+    assignee = models.ManyToManyField(User, related_name='issue_assignees')
     label = models.ManyToManyField(Label)
     milestone = models.ForeignKey(Milestone, default=None, blank=True, null=True)
 
