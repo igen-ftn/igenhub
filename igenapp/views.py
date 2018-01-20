@@ -18,17 +18,17 @@ def index(request):
     return render(request, 'igenapp/index.html')
 
 
-def home(request):
-    return render(request, 'igenapp/home.html')
+def home(request, owner_name):
+    return render(request, 'igenapp/home.html', {'owner_name': owner_name})
 
 
-def wiki(request):
+def wiki(request, owner_name, repo_name):
     wikipages_list = WikiPage.objects.all()
-    return render(request, 'igenapp/wiki.html', {'wikipages': wikipages_list})
+    return render(request, 'igenapp/wiki.html', {'wikipages': wikipages_list, 'owner_name': owner_name, 'repo_name': repo_name})
     #return render(request, 'igenapp/wiki.html')
 
 
-def wiki_form(request):
+def wiki_form(request, owner_name, repo_name):
     if request.method == "POST":
         form = WikiForm(request.POST)
         if form.is_valid():
@@ -38,10 +38,12 @@ def wiki_form(request):
             context = dict()
             context['form'] = form
             context['message'] = "Error has occured:"
+            context['owner_name'] = owner_name
+            context['repo_name'] = repo_name
             return render(request, 'igenapp/wiki/form.html', context)
     else:
         form = WikiForm()
-        return render(request, 'igenapp/wiki/form.html', {'form': form})
+        return render(request, 'igenapp/wiki/form.html', {'form': form, 'owner_name': owner_name, 'repo_name': repo_name})
 
 
 def issues(request):
@@ -107,35 +109,38 @@ def issue_details(request, issue_id):
     return render(request, 'igenapp/issues/issue_details.html', {'issue': issue})
 
 
-def commits(request):
-    result = requests.get('https://api.github.com/repos/%s/%s/commits' % ('igen-ftn', 'igenhub'))
+def commits(request, owner_name, repo_name):
+    result = requests.get('https://api.github.com/repos/%s/%s/commits' % (owner_name, repo_name))
     commits = json.loads(result.content)
 
-    result = requests.get('https://api.github.com/repos/%s/%s/branches' % ('igen-ftn', 'igenhub'))
+    result = requests.get('https://api.github.com/repos/%s/%s/branches' % (owner_name, repo_name))
     branches = json.loads(result.content)
 
-    repo_info = RepositoryInfo('igen-ftn', 'igenhub', branches, commits)
+    repo_info = RepositoryInfo(owner_name, repo_name, branches, commits)
 
     return render(request, 'igenapp/commits/commits.html', {'repo_info': repo_info})
 
 
-def commit(request, commit_id):
-    result = requests.get('https://api.github.com/repos/%s/%s/commits/%s' % ('igen-ftn', 'igenhub', commit_id))
+def commit(request, owner_name, repo_name, commit_id):
+    result = requests.get('https://api.github.com/repos/%s/%s/commits/%s' % (owner_name, repo_name, commit_id))
     commit = json.loads(result.content)
     commit['commit']['author']['date'] = commit['commit']['author']['date'].replace('T', ' ')[:-1]
     commit['allAdditions'] = sum([file['additions'] for file in commit['files']])
     commit['allDeletions'] = sum([file['deletions'] for file in commit['files']])
 
-    return render(request, 'igenapp/commits/commit.html', {'commit': commit, 'owner_name': 'igen-ftn', 'repo_name': 'igenhub'})
+    return render(request, 'igenapp/commits/commit.html', {'commit': commit, 'owner_name': owner_name, 'repo_name': repo_name})
 
 
-def selected_branch(request):
+def selected_branch(request, owner_name, repo_name):
     branch = request.GET.get('branch')
-    result = requests.get('https://api.github.com/repos/%s/%s/commits?sha=%s' % ('igen-ftn', 'igenhub', branch))
-    commits = json.loads(result.content)
+    result = requests.get('https://api.github.com/repos/%s/%s/commits?sha=%s' % (owner_name, repo_name, branch))
+    branch_info = {'owner_name': owner_name, 'repo_name': repo_name, 'commits': json.loads(result.content)}
 
-    return JsonResponse(commits, safe=False)
+    return JsonResponse(branch_info, safe=False)
 
+
+def repositories(request, owner_name):
+    return render(request, 'igenapp/repository/repository.html', {'owner_name': owner_name})
 
 
 def signup(request):
