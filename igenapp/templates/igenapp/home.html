@@ -7,6 +7,10 @@
     {% endblock %}
   </head>
   <body>
+    {% block navbar %}
+      <li class="active"><a href="{% url 'home' owner_name %}">Home</a></li>
+      <li><a href="/{{owner_name}}/repositories">Repositories</a></li>
+    {% endblock %}
     {% block body %}
     <div class="jumbotron">
       <h1>Welcome To IgenHub</h1>

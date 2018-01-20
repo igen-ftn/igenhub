@@ -1,13 +1,17 @@
 $(function() {
     $('#selectedBranch').change(function() {
+        var url = '/' + $('#owner_name').text() + '/' + $('#repo_name').text() + '/selected_branch/';
         $.ajax({
-        url: '/selected_branch/',
+        url: url,
         data: {
           'branch': $('#selectedBranch').val()
         },
         dataType: 'json',
         success: function (data) {
             fillData(data);
+        },
+        error: function (data) {
+            console.log(data);
         }
         });
     });
@@ -15,7 +19,7 @@ $(function() {
     function fillData(data) {
         $('#commitsContent').empty();
 
-        for (var i in data) {
+        for (var i in data.commits) {
             $('#commitsContent').append(
                 "<div class=\"col-sm-8\">" +
                     "<div class=\"panel panel-white post panel-shadow\">" +
@@ -25,12 +29,12 @@ $(function() {
                             "</div>" +
                             "<div class=\"pull-left meta\">" +
                                 "<div class=\"title mt\" style=\"white-space: nowrap;overflow: hidden;text-overflow: ellipsis;max-width: 520px;\" >" +
-                                    "<a href=\"/commit/" + data[i].sha + "/\">" + data[i].commit.message + "</a>" +
+                                    "<a href=\"/" + data.owner_name + "/" + data.repo_name + "/commit/" + data.commits[i].sha + "/\">" + data.commits[i].commit.message + "</a>" +
                                 "</div>" +
-                                "<h6 class=\"text-muted time\">Committed by: <b>" + data[i].commit.author.name + "</b></h6>" +
+                                "<h6 class=\"text-muted time\">Committed by: <b>" + data.commits[i].commit.author.name + "</b></h6>" +
                             "</div>" +
                             "<div class=\"col-sm-2\" style=\"float:right; width: 55px;\">" +
-                                "<a href=\"/commit/" + data[i].sha + "/\" class=\"btn btn-success btn-circle text-uppercase\"><span class=\"glyphicon glyphicon-th-large\"></span></a>" +
+                                "<a href=\"/" + data.owner_name + "/" + data.repo_name + "/commit/" + data.commits[i].sha + "/\" class=\"btn btn-success btn-circle text-uppercase\"><span class=\"glyphicon glyphicon-th-large\"></span></a>" +
                             "</div>" +
                         "</div>" +
                     "</div>" +
