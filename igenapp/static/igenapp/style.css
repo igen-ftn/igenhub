@@ -131,7 +131,7 @@ textarea {
 }
 .label-div{
     height: 25px;
-    width: 80px;
+    width: 100px;
     padding: 3px;
     text-align: center;
     color: white;
@@ -139,6 +139,9 @@ textarea {
     border-radius: 3px;
     border: 1px solid #dddddd;
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+th, td{
+    vertical-align: middle !important;
 }
 .mt {
     margin-top: 3px;

@@ -42,6 +42,7 @@
                 <th>Title</th>
                 <th>Description</th>
                 <th>Due date</th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -50,6 +51,9 @@
                     <td>{{milestone.title}}</td>
                     <td>{{milestone.description}}</td>
                     <td>{{milestone.due_date}}</td>
+                    <td style="text-align:right;">
+                        <a href="{% url 'remove_milestone' milestone.id %}"><span class="glyphicon glyphicon-remove"></span></a>
+                    </td>
                 </tr>
                 {% endfor %}
         </tbody>

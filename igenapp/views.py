@@ -68,7 +68,7 @@ def add_issue(request, issue_id):
         if form.is_valid():
             if int(issue_id) != 0:
                 Issue.objects.filter(pk=issue_id).update(title=form.cleaned_data['title'],
-                                      text=form.cleaned_data['text'], ordinal=1, date=datetime.datetime.now())
+                                      text=form.cleaned_data['text'], ordinal=1)
                 issue = get_object_or_404(Issue, pk=issue_id)
                 if form.cleaned_data['milestone'] == 'null':
                     issue.milestone = None
@@ -119,6 +119,12 @@ def add_milestone(request):
     return render(request, 'igenapp/issues/issues.html', {'issues': issues_list})
 
 
+def remove_milestone(request, milestone_id):
+    Milestone.objects.filter(pk=milestone_id).delete()
+    milestone_list = Milestone.objects.all()
+    return render(request, 'igenapp/milestones/milestones.html', {'milestones': milestone_list})
+
+
 def labels(request):
     label_list = Label.objects.all()
     return render(request, 'igenapp/labels/labels.html', {'labels': label_list})
@@ -134,6 +140,12 @@ def add_label(request):
 
     issues_list = Issue.objects.order_by('-date')
     return render(request, 'igenapp/issues/issues.html', {'issues': issues_list})
+
+
+def remove_label(request, label_id):
+    Label.objects.filter(pk=label_id).delete()
+    label_list = Label.objects.all()
+    return render(request, 'igenapp/labels/labels.html', {'labels': label_list})
 
 
 def commits(request):

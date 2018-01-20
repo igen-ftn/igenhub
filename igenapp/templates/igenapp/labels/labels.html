@@ -33,15 +33,19 @@
     <table class="table">
         <thead>
             <tr>
-              <th>Name</th>
-              <th>Color</th>
+                <th>Name</th>
+                <th>Color</th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
                 {% for label in labels %}
                 <tr>
-                  <td>{{label.name}}</td>
-                  <td><input type="color" class="form-control" value="{{label.color}}" disabled></td>
+                    <td>{{label.name}}</td>
+                    <td><input type="color" class="form-control" value="{{label.color}}" disabled></td>
+                    <td style="text-align:right;">
+                        <a href="{% url 'remove_label' label.id %}"><span class="glyphicon glyphicon-remove"></span></a>
+                    </td>
                 </tr>
                 {% endfor %}
         </tbody>
