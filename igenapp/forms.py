@@ -10,6 +10,12 @@ class IssueForm(forms.Form):
     milestone = forms.CharField(max_length=100)
 
 
+class LabelForm(forms.Form):
+
+    name = forms.CharField(max_length=100)
+    color = forms.CharField(max_length=7)
+
+
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget = forms.PasswordInput(render_value = True))
     email = forms.CharField(widget = forms.EmailInput)

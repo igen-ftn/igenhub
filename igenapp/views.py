@@ -107,6 +107,32 @@ def issue_details(request, issue_id):
     return render(request, 'igenapp/issues/issue_details.html', {'issue': issue})
 
 
+def milestones(request):
+    milestone_list = Milestone.objects.all()
+    return render(request, 'igenapp/milestones/milestones.html', {'milestones': milestone_list})
+
+
+def new_milestone(request):
+    return render(request, 'igenapp/milestones/new_milestone.html')
+
+
+def labels(request):
+    label_list = Label.objects.all()
+    return render(request, 'igenapp/labels/labels.html', {'labels': label_list})
+
+
+def add_label(request):
+    if request.method == "POST":
+        form = LabelForm(request.POST)
+        if form.is_valid():
+            Label.objects.create(name=form.cleaned_data['name'], color=form.cleaned_data['color'])
+    else:
+        form = LabelForm()
+
+    issues_list = Issue.objects.order_by('-date')
+    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list})
+
+
 def commits(request):
     result = requests.get('https://api.github.com/repos/%s/%s/commits' % ('igen-ftn', 'igenhub'))
     commits = json.loads(result.content)
@@ -135,7 +161,6 @@ def selected_branch(request):
     commits = json.loads(result.content)
 
     return JsonResponse(commits, safe=False)
-
 
 
 def signup(request):

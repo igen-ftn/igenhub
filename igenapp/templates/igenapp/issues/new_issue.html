@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 
 {% block body %}
+{% if issue.id != undefined %}
+<h1>Update Issue</h1>
+{% else %}
 <h1>New Issue</h1>
+{% endif %}
 <br/>
 <div>
     <form class="form-horizontal" {% if issue.id != undefined %} action="{% url 'add_issue' issue.id %}"
@@ -32,7 +36,9 @@
                 </select>
             </div>
             <div class="col-sm-2">
-                <button class="btn btn-success btn-circle text-uppercase" style="height: 30px;"><span class="glyphicon glyphicon-plus-sign"></span>  New</button>
+                <a href="{% url 'labels' %}" class="btn btn-success btn-circle text-uppercase" style="height: 30px;">
+                    <span class="glyphicon glyphicon-plus-sign"></span>  New
+                </a>
             </div>
         </div>
         <div class="form-group">
@@ -49,7 +55,9 @@
                 </select>
             </div>
             <div class="col-sm-2">
-                <button class="btn btn-success btn-circle text-uppercase" style="height: 30px;"><span class="glyphicon glyphicon-plus-sign"></span>  New</button>
+                <a href="{% url 'new_milestone' %}" class="btn btn-success btn-circle text-uppercase" style="height: 30px;">
+                    <span class="glyphicon glyphicon-plus-sign"></span>  New
+                </a>
             </div>
         </div>
         <div class="form-group">
