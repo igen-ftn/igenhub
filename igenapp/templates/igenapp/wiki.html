@@ -18,22 +18,22 @@
     {% block body %}
     <h1>Wiki</h1>
     <label>Repository: {{repo_name}} | Owner: {{owner_name}}</label>
-    <br /><br />
+    <br><br>
 
     <div class="row">
       <div class="btn-group">
         <a href="/{{owner_name}}/{{repo_name}}/wiki-form/" class="btn btn-primary">+ New Wiki Page</a>
       </div>
     </div>
-
+    <br>
     <div class="row">
       <div class="list-group">
         {% for wikipage in wikipages %}
-        <a href="#" class="list-group-item">{{wikipage.title}}</a>
+        <a href="/{{owner_name}}/{{repo_name}}/wiki-page/{{wikipage.id}}" class="list-group-item">{{wikipage.title}}</a>
         {% endfor %}
       </div>
     </div>
-    
+
     {% endblock %}
   </body>
 </html>

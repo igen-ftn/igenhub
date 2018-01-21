@@ -7,6 +7,7 @@ urlpatterns = [
                #url(r'(?P<tea>\w+)/$', views.insert, name='insert'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/wiki/$', views.wiki, name='wiki'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/wiki-form/$', views.wiki_form, name='wiki-form'),
+    url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/wiki-page/(?P<wikipage_id>\d+)/$', views.wiki_page, name='wiki-page'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/issues/$', views.issues, name='issues'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/issue/(?P<issue_id>\d+)/$', views.new_issue, name='new_issue'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/add_issue/(?P<issue_id>\d+)/$', views.add_issue, name='add_issue'),

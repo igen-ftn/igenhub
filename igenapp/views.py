@@ -46,6 +46,12 @@ def wiki_form(request, owner_name, repo_name):
         return render(request, 'igenapp/wiki/form.html', {'form': form, 'owner_name': owner_name, 'repo_name': repo_name})
 
 
+def wiki_page(request, owner_name, repo_name, wikipage_id):
+    wikipage = get_object_or_404(WikiPage, pk=wikipage_id)
+    return render(request, 'igenapp/wiki/page.html', {'wiki': wikipage,
+                                                                 'owner_name': owner_name, 'repo_name': repo_name})
+
+
 def issues(request, owner_name, repo_name):
     issues_list = Issue.objects.order_by('-date')
     return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'owner_name': owner_name, 'repo_name': repo_name})
