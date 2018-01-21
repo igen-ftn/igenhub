@@ -1,10 +1,19 @@
 {% extends 'base.html' %}
 
+{% block navbar %}
+    <li><a href="{% url 'home' owner_name %}">Home</a></li>
+    <li><a href="/{{owner_name}}/repositories">Repositories</a></li>
+    <li><a href="/{{owner_name}}/{{repo_name}}/wiki">Wiki</a></li>
+    <li class="active"><a href="/{{owner_name}}/{{repo_name}}/issues">Issues</a></li>
+    <li><a href="/{{owner_name}}/{{repo_name}}/commits/">Commits</a></li>
+{% endblock %}
+
 {% block body %}
 <h1>New Milestone</h1>
-<br/>
+<label>Repository: {{repo_name}} | Owner: {{owner_name}}</label>
+<br /><br />
 <div>
-    <form class="form-horizontal" action="{% url 'add_milestone' %}" method="post">{% csrf_token %}
+    <form class="form-horizontal" action="/{{owner_name}}/{{repo_name}}/add_milestone/" method="post">{% csrf_token %}
         <div class="form-group">
             <label class="col-sm-2 control-label" style="text-align:left; width:100px;">Title:</label>
             <div class="col-sm-4">
@@ -52,7 +61,7 @@
                     <td>{{milestone.description}}</td>
                     <td>{{milestone.due_date}}</td>
                     <td style="text-align:right;">
-                        <a href="{% url 'remove_milestone' milestone.id %}"><span class="glyphicon glyphicon-remove"></span></a>
+                        <a href="/{{owner_name}}/{{repo_name}}/milestones/{{milestone.id}}"><span class="glyphicon glyphicon-remove"></span></a>
                     </td>
                 </tr>
                 {% endfor %}

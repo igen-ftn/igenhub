@@ -4,6 +4,11 @@
     <title>Profile</title>
 {% endblock %}
 
+{% block navbar %}
+    <li><a href="{% url 'home' owner_name %}">Home</a></li>
+    <li><a href="/{{owner_name}}/repositories">Repositories</a></li>
+{% endblock %}
+
 {% block body %}
     <h3>Profile:</h3>
     <p>{{message}}</p>

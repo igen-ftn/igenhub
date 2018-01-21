@@ -1,9 +1,18 @@
 {% extends 'base.html' %}
+
+{% block navbar %}
+    <li><a href="{% url 'home' owner_name %}">Home</a></li>
+    <li><a href="/{{owner_name}}/repositories">Repositories</a></li>
+    <li><a href="/{{owner_name}}/{{repo_name}}/wiki">Wiki</a></li>
+    <li class="active"><a href="/{{owner_name}}/{{repo_name}}/issues">Issues</a></li>
+    <li><a href="/{{owner_name}}/{{repo_name}}/commits/">Commits</a></li>
+{% endblock %}
+
 {% block body %}
 <h1>{{issue.title}}</h1>
 <br/>
 <div>
-    <form class="form-horizontal" action="{% url 'new_issue' issue.id  %}" method="post">{% csrf_token %}
+    <form class="form-horizontal" action="/{{owner_name}}/{{repo_name}}/issue/{{issue.id}}/" method="post">{% csrf_token %}
       <div class="form-group">
             <label class="col-sm-2 control-label" style="text-align:left; width:100px;">Title:</label>
             <div class="col-sm-10">

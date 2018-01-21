@@ -1,15 +1,25 @@
 {% extends 'base.html' %}
+
+{% block navbar %}
+    <li><a href="{% url 'home' owner_name %}">Home</a></li>
+    <li><a href="/{{owner_name}}/repositories">Repositories</a></li>
+    <li><a href="/{{owner_name}}/{{repo_name}}/wiki">Wiki</a></li>
+    <li class="active"><a href="/{{owner_name}}/{{repo_name}}/issues">Issues</a></li>
+    <li><a href="/{{owner_name}}/{{repo_name}}/commits/">Commits</a></li>
+{% endblock %}
+
 {% block body %}
 <h1>Issues</h1>
-<br/>
+<label>Repository: {{repo_name}} | Owner: {{owner_name}}</label>
+<br /><br />
 <div class="row">
     <div class="col-sm-8">
         <div style="width: 90%;">
-            <a href="{% url 'new_issue' 0 %}" class="btn btn-success btn-circle text-uppercase"><span class="glyphicon glyphicon-plus-sign"></span> New Issue</a>
-            <a href="{% url 'milestones' %}" class="btn btn-success btn-circle text-uppercase" style="float: right; width: 130px;">
+            <a href="/{{owner_name}}/{{repo_name}}/issue/0" class="btn btn-success btn-circle text-uppercase"><span class="glyphicon glyphicon-plus-sign"></span> New Issue</a>
+            <a href="/{{owner_name}}/{{repo_name}}/milestones" class="btn btn-success btn-circle text-uppercase" style="float: right; width: 130px;">
                 <span class="glyphicon glyphicon-pushpin"></span> Milestones
             </a>
-            <a href="{% url 'labels' %}" class="btn btn-success btn-circle text-uppercase" style="float: right; width: 130px; margin-right: 5px;">
+            <a href="/{{owner_name}}/{{repo_name}}/labels" class="btn btn-success btn-circle text-uppercase" style="float: right; width: 130px; margin-right: 5px;">
                 <span class="glyphicon glyphicon-tags"></span> Labels
             </a>
         </div>
@@ -44,7 +54,7 @@
                 {% endif %}
             </div>
             <div class="post-description">
-                <p> <a href="{% url 'issue_details' issue.id %}">{{issue.title}}</a>  </p>
+                <p> <a href="/{{owner_name}}/{{repo_name}}/issues/{{issue.id}}">{{issue.title}}</a>  </p>
                 {% if issue.assignee.all %}
                 <p> <b>Assignees:</b>
                     {% for user in issue.assignee.all %}
