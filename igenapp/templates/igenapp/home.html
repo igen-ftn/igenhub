@@ -7,9 +7,34 @@
     {% endblock %}
   </head>
   <body>
+    {% block navbar %}
+      <li class="active"><a href="{% url 'home' owner_name %}">Home</a></li>
+      <li><a href="/{{owner_name}}/repositories">Repositories</a></li>
+    {% endblock %}
     {% block body %}
-    <h1>Home</h1>
-    <p>Just some example text.</p>
+    <div class="jumbotron">
+      <h1>Welcome To IgenHub</h1>
+      <p>A web application designed to make team development easier.</p>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <img class="img-responsive" src="/static/igenapp/img/igen.png" alt="Chania">
+      </div>
+      <div class="col-md-6">
+        <blockquote>
+          <h3>
+            We are a young team, friends gathered in non-profit organization IGEN.
+            Driven only by our desire to learn and improve the world we created IgenHub.
+            This application is supervised by our class Assistant Milos Simic and Professor Igor Dejanovic.
+            We hope to grow in future, and invite everyone to join our open source project
+            where you can help us improve the future of team work.
+          </h3>
+          <footer>
+            Team IGEN
+          </footer>
+        </blockquote>
+      </div>
+    </div>
     {% endblock %}
   </body>
 </html>

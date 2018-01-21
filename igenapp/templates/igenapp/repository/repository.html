@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block navbar %}
+<li><a href="{% url 'home' owner_name %}">Home</a></li>
+<li class="active"><a href="/{{owner_name}}/repositories">Repositories</a></li>
+{% endblock %}
+
+{% block body %}
+<h1>Repositories</h1>
+<label>Owner: {{owner_name}}</label>
+<br /><br />
+<div class="row">
+    <div class="col-sm-10">
+        <a href="#" class="btn btn-success btn-circle text-uppercase"><span class="glyphicon glyphicon-plus-sign"></span> New Repository</a>
+    </div>
+</div>
+<br /><br />
+<div class="row">
+    <div class="col-sm-8">
+        <div class="panel panel-white post panel-shadow">
+            <div class="post-heading1">
+                <div class="pull-left image">
+                    <img src="http://bootdey.com/img/Content/user_1.jpg" class="img-circle avatar1" alt="user profile image">
+                </div>
+                <div class="pull-left meta">
+                    <div class="title mt" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;max-width: 520px;">
+                        <a href="/{{owner_name}}/igenhub/commits"><b>igenhub</b></a>
+                    </div>
+                </div>
+                <div class="col-sm-2" style="float:right; width: 55px;">
+                    <a href="#" class="btn btn-danger btn-circle text-uppercase"><span class="glyphicon glyphicon-remove"></span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

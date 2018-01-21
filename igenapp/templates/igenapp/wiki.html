@@ -7,9 +7,33 @@
     {% endblock %}
   </head>
   <body>
+    {% block navbar %}
+      <li><a href="{% url 'home' owner_name %}">Home</a></li>
+      <li><a href="/{{owner_name}}/repositories">Repositories</a></li>
+      <li class="active"><a href="/{{owner_name}}/{{repo_name}}/wiki">Wiki</a></li>
+      <li><a href="/{{owner_name}}/{{repo_name}}/issues">Issues</a></li>
+      <li><a href="/{{owner_name}}/{{repo_name}}/commits/">Commits</a></li>
+    {% endblock %}
+
     {% block body %}
     <h1>Wiki</h1>
-    <p>Just some example text.</p>
+    <label>Repository: {{repo_name}} | Owner: {{owner_name}}</label>
+    <br /><br />
+
+    <div class="row">
+      <div class="btn-group">
+        <a href="/{{owner_name}}/{{repo_name}}/wiki-form/" class="btn btn-primary">+ New Wiki Page</a>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="list-group">
+        {% for wikipage in wikipages %}
+        <a href="#" class="list-group-item">{{wikipage.title}}</a>
+        {% endfor %}
+      </div>
+    </div>
+    
     {% endblock %}
   </body>
 </html>
