@@ -270,3 +270,9 @@ def edit_comment(request, owner_name, repo_name, issue_id):
         comment.content = request.POST['content']
         comment.save()
     return redirect('issue_details', owner_name, repo_name, issue_id)
+
+def delete_comment(request, owner_name, repo_name, issue_id, comment_id):
+    if request.method == "POST":
+        comment = Comment.objects.get(id=comment_id)
+        comment.delete()
+    return redirect('issue_details', owner_name, repo_name, issue_id)
