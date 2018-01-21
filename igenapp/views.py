@@ -104,7 +104,8 @@ def add_issue(request, owner_name, repo_name, issue_id):
 
 def issue_details(request, owner_name, repo_name, issue_id):
     issue = get_object_or_404(Issue, pk=issue_id)
-    return render(request, 'igenapp/issues/issue_details.html', {'issue': issue,
+    comments = Comment.objects.filter(issue = issue).order_by('date')
+    return render(request, 'igenapp/issues/issue_details.html', {'issue': issue, 'comments': comments,
                                                                  'owner_name': owner_name, 'repo_name': repo_name})
 
 
@@ -250,3 +251,14 @@ def editUser(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+def add_comment(request, owner_name, repo_name, issue_id):
+    #user = request.user
+    if request.method == "POST":
+        comment = Comment()
+        comment.content = request.POST['content']
+        comment.user = request.user
+        comment.date = datetime.datetime.now()
+        comment.issue = Issue.objects.get(id=issue_id)
+        comment.save()
+        return redirect('issue_details', owner_name, repo_name, issue_id)

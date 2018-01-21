@@ -38,4 +38,57 @@
         </div>
     </form>
 </div>
+<!-- comments -->
+{% for comment in comments %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-1">
+            <div class="thumbnail">
+                <img class="img-responsive user-photo" src="https://ssl.gstatic.com/accounts/ui/avatar_2x.png">
+            </div>
+        </div>
+        <div class="col-sm-5">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <strong>{{comment.user.username}}</strong><span class="text-muted pull-right">{{comment.date}}</span>
+                </div>
+                <div class="panel-body">
+                    {{comment.content}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+<!-- write new comment -->
+{% if user.is_authenticated %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-1">
+                <div class="thumbnail">
+                    <img class="img-responsive user-photo" src="https://ssl.gstatic.com/accounts/ui/avatar_2x.png">
+                </div>
+            </div>
+            <div class="col-sm-5">
+                <form action="{% url 'add_comment' owner_name repo_name issue.id %}" method="post">
+                    {% csrf_token %}
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <strong>{{user.username}}</strong>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <textarea id="content" name="content" rows="4" class="form-control" placeholder="Write a comment.."></textarea>
+                            </div>
+                            <div class="row">
+                                <input type="Submit" class="pull-right btn btn-success" value="Comment"/>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
 {% endblock body %}
