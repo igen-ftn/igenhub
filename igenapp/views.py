@@ -162,6 +162,10 @@ def remove_label(request, owner_name, repo_name, label_id):
 
 
 def commits(request, owner_name, repo_name):
+    if owner_name == request.user.username:
+        return render(request, 'igenapp/commits/commits.html',
+                      {'repo_info': {'owner_name': owner_name, 'repo_name': repo_name}})
+
     result = requests.get('https://api.github.com/repos/%s/%s/commits' % (owner_name, repo_name))
     commits = json.loads(result.content)
 
@@ -192,7 +196,57 @@ def selected_branch(request, owner_name, repo_name):
 
 
 def repositories(request, owner_name):
-    return render(request, 'igenapp/repository/repository.html', {'owner_name': owner_name})
+    repositories = Repository.objects.filter(author=request.user).all()
+
+    return render(request, 'igenapp/repository/repository.html',
+                  {'repositories': repositories, 'owner_name': request.user.username})
+
+
+def new_repository(request, owner_name):
+    users = User.objects.all().exclude(username=owner_name)
+    return render(request, 'igenapp/repository/new_repository.html', {'users': users, 'owner_name': owner_name})
+
+
+def add_repository(request, owner_name):
+    if request.method == "POST":
+        error = True
+        repo_type = request.POST.get('repo_type')
+        if repo_type == "local":
+            form = LocalRepositoryForm(request.POST)
+            if form.is_valid():
+                repository = Repository(author=request.user, repo_name=form.cleaned_data['repo_name'],
+                                        owner_name=request.user.username, type='L')
+                repository.save()
+                contributors = request.POST.getlist('contributors')
+                repository.contributors.clear()
+                for contributor in contributors:
+                    repository.contributors.add(contributor)
+                repository.save()
+                error = False
+        elif repo_type == "git":
+            form = GitRepositoryForm(request.POST)
+            if form.is_valid():
+                repo_url = form.cleaned_data['repo_url']
+                if not repo_url.endswith(".git"):
+                    return redirect('/' + owner_name + '/new_repository')
+                owner_repo_name = repo_url[repo_url.rfind("/", 0, repo_url.rfind("/"))+1:repo_url.rfind("/")]
+                repo_name = repo_url[repo_url.rfind("/")+1:-4]
+                repository = Repository(author=request.user, repo_name=repo_name,
+                                        owner_name=owner_repo_name, type='G', url=repo_url)
+                repository.save()
+                contributors = request.POST.getlist('contributors')
+                repository.contributors.clear()
+                for contributor in contributors:
+                    repository.contributors.add(contributor)
+                repository.save()
+                error = False
+
+        if error:
+            return redirect('/' + owner_name + '/new_repository')
+
+        return redirect('/'+owner_name+'/repositories')
+    else:
+        return redirect('/' + owner_name + '/new_repository')
 
 
 def signup(request):

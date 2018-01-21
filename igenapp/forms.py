@@ -16,6 +16,16 @@ class LabelForm(forms.Form):
     color = forms.CharField(max_length=7)
 
 
+class LocalRepositoryForm(forms.Form):
+
+    repo_name = forms.CharField(max_length=70)
+
+
+class GitRepositoryForm(forms.Form):
+
+    repo_url = forms.CharField(max_length=150)
+
+
 class MilestoneForm(forms.Form):
 
     title = forms.CharField(max_length=100)

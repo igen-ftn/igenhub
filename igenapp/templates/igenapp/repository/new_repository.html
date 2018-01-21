@@ -18,7 +18,7 @@
     <div id="local" class="tab-pane fade in active">
         <h3>Local repository</h3>
         <br /><br />
-        <form class="form-horizontal" action="/{{owner_name}}/{{repo_name}}/add_issue/{{issue.id}}/" method="post">
+        <form class="form-horizontal" action="/{{owner_name}}/add_repository/" method="post">
             {% csrf_token %}
             <div class="form-group">
                 <label class="col-sm-2 control-label" style="text-align:left; width:100px;">Name:</label>
@@ -30,10 +30,9 @@
             <div class="form-group">
                 <label class="col-sm-2 control-label" style="text-align:left; width:100px;">Contributors:</label>
                 <div class="col-sm-2">
-                    <select name="assignees" multiple="multiple" style="width: 300px;">
+                    <select name="contributors" multiple="multiple" style="width: 300px;">
                         {% for user in users %}
-                        <option value="{{user.id}}"
-                            {% if user in issue.assignee.all %} selected='selected' {% endif %}>
+                        <option value="{{user.id}}">
                             {{user.username}}
                         </option>
                         {% endfor %}
@@ -51,34 +50,21 @@
     <div id="git" class="tab-pane fade">
         <h3>Git repository</h3>
         <br /><br />
-        <form class="form-horizontal" action="/{{owner_name}}/{{repo_name}}/add_issue/{{issue.id}}/" method="post">
+        <form class="form-horizontal" action="/{{owner_name}}/add_repository/" method="post">
             {% csrf_token %}
-            <div class="form-group">
-                <label class="col-sm-2 control-label" style="text-align:left; width:158px;">Owner name:</label>
-                <div class="col-sm-10">
-                    <input type="text" name="repo_name" class="form-control" style="width:300px">
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-2 control-label" style="text-align:left; width:158px;">Repository name:</label>
-                <div class="col-sm-10">
-                    <input type="text" name="repo_name" class="form-control" style="width:300px">
-                    <input type="hidden" name="repo_type" value="git">
-                </div>
-            </div>
             <div class="form-group">
                 <label class="col-sm-2 control-label" style="text-align:left; width:158px;">Repository url:</label>
                 <div class="col-sm-10">
-                    <input type="text" name="repo_name" class="form-control" style="width:300px">
+                    <input type="text" name="repo_url" class="form-control" style="width:300px">
+                    <input type="hidden" name="repo_type" value="git">
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-2 control-label" style="text-align:left; width:158px;">Contributors:</label>
                 <div class="col-sm-2">
-                    <select name="assignees" multiple="multiple" style="width: 300px;">
+                    <select name="contributors" multiple="multiple" style="width: 300px;">
                         {% for user in users %}
-                        <option value="{{user.id}}"
-                            {% if user in issue.assignee.all %} selected='selected' {% endif %}>
+                        <option value="{{user.id}}">
                             {{user.username}}
                         </option>
                         {% endfor %}
