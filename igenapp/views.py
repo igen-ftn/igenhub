@@ -46,47 +46,40 @@ def wiki_form(request, owner_name, repo_name):
         return render(request, 'igenapp/wiki/form.html', {'form': form, 'owner_name': owner_name, 'repo_name': repo_name})
 
 
-def issues(request):
-    #######################
-    #User.objects.all().delete()
-    #Issue.objects.all().delete()
-    # Milestone.objects.all().delete()
-    # Label.objects.all().delete()
-    # Label.objects.create(name='bug', color='R')
-    # Label.objects.create(name='feature', color='Y')
-    # Milestone.objects.create(title='Milestone 1', description='This is first milestone', creation_date=datetime.datetime.now())
-    ###########################
+def issues(request, owner_name, repo_name):
     issues_list = Issue.objects.order_by('-date')
-    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list})
+    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'owner_name': owner_name, 'repo_name': repo_name})
 
 
-def new_issue(request, issue_id):
+def new_issue(request, owner_name, repo_name, issue_id):
     milestone_list = Milestone.objects.all()
     label_list = Label.objects.all()
     users = User.objects.all()
     try:
         issue = Issue.objects.get(pk=issue_id)
         return render(request, 'igenapp/issues/new_issue.html', {'labels': label_list, 'milestones': milestone_list,
-                                                                 'issue': issue, 'users': users})
+                                                                 'issue': issue, 'users': users,
+                                                                 'owner_name': owner_name, 'repo_name': repo_name})
     except Issue.DoesNotExist:
         return render(request, 'igenapp/issues/new_issue.html', {'labels': label_list, 'milestones': milestone_list,
-                                                                 'users': users})
+                                                                 'users': users,
+                                                                 'owner_name': owner_name, 'repo_name': repo_name})
 
 
-def add_issue(request, issue_id):
+def add_issue(request, owner_name, repo_name, issue_id):
     if request.method == "POST":
         form = IssueForm(request.POST)
         if form.is_valid():
             if int(issue_id) != 0:
                 Issue.objects.filter(pk=issue_id).update(title=form.cleaned_data['title'],
-                                      text=form.cleaned_data['text'], ordinal=1, date=datetime.datetime.now())
+                                                         text=form.cleaned_data['text'], ordinal=1, status='O')
                 issue = get_object_or_404(Issue, pk=issue_id)
                 if form.cleaned_data['milestone'] == 'null':
                     issue.milestone = None
                     issue.save()
             else:
                 issue = Issue(title=form.cleaned_data['title'], text=form.cleaned_data['text'], ordinal=1,
-                              date=datetime.datetime.now())
+                              date=datetime.datetime.now(), status='O', user=request.user)
                 issue.save()
             if form.cleaned_data['milestone'] != 'null':
                 milestone = get_object_or_404(Milestone, pk=form.cleaned_data['milestone'])
@@ -96,17 +89,76 @@ def add_issue(request, issue_id):
             issue.label.clear()
             for label in labels:
                 issue.label.add(label)
+            assignees = request.POST.getlist('assignees')
+            issue.assignee.clear()
+            for assignee in assignees:
+                issue.assignee.add(assignee)
             issue.save()
     else:
         form = IssueForm()
 
     issues_list = Issue.objects.order_by('-date')
-    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list})
+    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list,
+                                                          'owner_name': owner_name, 'repo_name': repo_name})
 
 
-def issue_details(request, issue_id):
+def issue_details(request, owner_name, repo_name, issue_id):
     issue = get_object_or_404(Issue, pk=issue_id)
-    return render(request, 'igenapp/issues/issue_details.html', {'issue': issue})
+    return render(request, 'igenapp/issues/issue_details.html', {'issue': issue,
+                                                                 'owner_name': owner_name, 'repo_name': repo_name})
+
+
+def milestones(request, owner_name, repo_name):
+    milestone_list = Milestone.objects.all()
+    return render(request, 'igenapp/milestones/milestones.html',
+                  {'milestones': milestone_list, 'owner_name': owner_name, 'repo_name': repo_name})
+
+
+def add_milestone(request, owner_name, repo_name):
+    if request.method == "POST":
+        form = MilestoneForm(request.POST)
+        if form.is_valid():
+            due_date = request.POST.get('due_date')
+            if due_date == '':
+                due_date = None
+            Milestone.objects.create(title=form.cleaned_data['title'], description=form.cleaned_data['description'],
+                                     creation_date=datetime.datetime.now(), due_date=due_date, status='O')
+    else:
+        form = MilestoneForm()
+
+    milestone_list = Milestone.objects.all()
+    return render(request, 'igenapp/milestones/milestones.html',
+                  {'milestones': milestone_list, 'owner_name': owner_name, 'repo_name': repo_name})
+
+
+def remove_milestone(request, owner_name, repo_name, milestone_id):
+    Milestone.objects.filter(pk=milestone_id).delete()
+    milestone_list = Milestone.objects.all()
+    return render(request, 'igenapp/milestones/milestones.html',
+                  {'milestones': milestone_list, 'owner_name': owner_name, 'repo_name': repo_name})
+
+
+def labels(request, owner_name, repo_name):
+    label_list = Label.objects.all()
+    return render(request, 'igenapp/labels/labels.html', {'labels': label_list, 'owner_name': owner_name, 'repo_name': repo_name})
+
+
+def add_label(request, owner_name, repo_name):
+    if request.method == "POST":
+        form = LabelForm(request.POST)
+        if form.is_valid():
+            Label.objects.create(name=form.cleaned_data['name'], color=form.cleaned_data['color'])
+    else:
+        form = LabelForm()
+
+    label_list = Label.objects.all()
+    return render(request, 'igenapp/labels/labels.html', {'labels': label_list, 'owner_name': owner_name, 'repo_name': repo_name})
+
+
+def remove_label(request, owner_name, repo_name, label_id):
+    Label.objects.filter(pk=label_id).delete()
+    label_list = Label.objects.all()
+    return render(request, 'igenapp/labels/labels.html', {'labels': label_list, 'owner_name': owner_name, 'repo_name': repo_name})
 
 
 def commits(request, owner_name, repo_name):
@@ -179,11 +231,13 @@ def editUser(request):
             context = dict()
             context['form'] = form
             context['message'] = 'Error updating profile info. Please check input data!'
+            context['owner_name'] = 'igen-ftn'
             return render(request, 'igenapp/user_profile.html', context)
     else:
         user = request.user
         context = dict()
         context['form'] = UserEditForm(instance=user)
+        context['owner_name'] = 'igen-ftn'
         #form = UserEditForm(initial = {'first_name': user.first_name, 'last_name': user.last_name, 'username': user.username, 'email': user.email})
         return render(request, 'igenapp/user_profile.html', context)
 

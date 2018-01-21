@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+
 # Create your models here.
 
 
@@ -8,6 +9,7 @@ class Example(models.Model):
 
     def __str__(self):
         return self.text
+
 
 class RepositoryInfo:
     def __init__(self, owner_name, repo_name, branches, commits, selected_branch='master'):
@@ -22,13 +24,7 @@ class Label(models.Model):
 
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=20)
-    COLOR_CHOICE = (
-        ('R', '#ee0701'),
-        ('B', '#84b6eb'),
-        ('Y', '#fbca04'),
-        ('G', '#33aa3f'),
-    )
-    color = models.CharField(max_length=1, choices=COLOR_CHOICE)
+    color = models.CharField(max_length=7)
 
 
 class Milestone(models.Model):
@@ -58,8 +54,8 @@ class Issue(models.Model):
     )
     status = models.CharField(max_length=1, choices=STATUS_CHOICE, default='O')
     #comments
-    #user = models.ForeignKey(User)
-    #assignee = models.OneToOneField(User)
+    user = models.ForeignKey(User)
+    assignee = models.ManyToManyField(User, related_name='issue_assignees')
     label = models.ManyToManyField(Label)
     milestone = models.ForeignKey(Milestone, default=None, blank=True, null=True)
 
