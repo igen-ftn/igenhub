@@ -22,6 +22,7 @@ urlpatterns = [
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/selected_branch/$', views.selected_branch, name='selected_branch'),
     url(r'^^(?P<owner_name>[\w-]+)/repositories/$', views.repositories, name='repositories'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/issues/(?P<issue_id>\d+)/comments/$', views.add_comment, name='add_comment'),
+    url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/issues/(?P<issue_id>\d+)/comments/edit/$', views.edit_comment, name='edit_comment'),
     url(r'^signup/$', views.signup, name='signup'),
     url(r'^accounts/profile/$', views.editUser, name='editUser'),
     url(r'^login/$', auth_views.login, name='login'),

@@ -262,3 +262,11 @@ def add_comment(request, owner_name, repo_name, issue_id):
         comment.issue = Issue.objects.get(id=issue_id)
         comment.save()
         return redirect('issue_details', owner_name, repo_name, issue_id)
+
+def edit_comment(request, owner_name, repo_name, issue_id):
+    if request.method == "POST":
+        comment_id = request.POST['comment_id']
+        comment = Comment.objects.get(id=comment_id)
+        comment.content = request.POST['content']
+        comment.save()
+    return redirect('issue_details', owner_name, repo_name, issue_id)

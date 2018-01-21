@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
-
+{% block head %}
+{% load staticfiles %}
+<script src="{% static 'igenapp/comment.js' %}"></script>
+{% endblock%}
 {% block navbar %}
     <li><a href="{% url 'home' owner_name %}">Home</a></li>
     <li><a href="/{{owner_name}}/repositories">Repositories</a></li>
@@ -50,11 +53,20 @@
         <div class="col-sm-5">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <strong>{{comment.user.username}}</strong><span class="text-muted pull-right">{{comment.date}}</span>
+                    <div class="row">
+                        {% if comment.user.username == user.username %}
+                            <button class="btn btn-sm btn-default glyphicon glyphicon-pencil pull-right pagination-centered" onclick="editComment('{{comment.content}}', {{comment.id}}, '{{owner_name}}', '{{repo_name}}', {{issue.id}})"></button>
+                        {% endif %}
+                        <b>&nbsp; {{comment.user.username}}</b>
+                        <span class="text-muted pull-right">{{comment.date}}</span>
+                    </div>
                 </div>
-                <div class="panel-body">
-                    {{comment.content}}
-                </div>
+                <form method="post" action="{% url 'edit_comment' owner_name repo_name issue.id%}">
+                    {% csrf_token %}
+                    <div class="panel-body" id="editCom{{comment.id}}">
+                        {{comment.content}}
+                    </div>
+                </form>
             </div>
         </div>
     </div>
