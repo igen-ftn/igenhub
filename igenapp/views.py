@@ -208,16 +208,16 @@ def signup(request):
             context = dict()
             context['form'] = form
             context['message'] = "Error has occured"
-            return render(request, 'igenapp/signup.html', context)
+            return render(request, 'igenapp/users/signup.html', context)
     else:
         form = UserForm()
-        return render(request, 'igenapp/signup.html', {'form':form})
+        return render(request, 'igenapp/users/signup.html', {'form':form})
 
 
 def editUser(request):
     #nacin dobavljanja korisnika iz sesije je request.user
     user = request.user
-    print("aaaa " + str(user.id))
+    #print("aaaa " + str(user.id))
     if request.method == "POST":
         form = UserEditForm(request.POST, instance=user)
         if form.is_valid():
@@ -225,21 +225,26 @@ def editUser(request):
             user.save()
             context = dict()
             context['form'] = UserEditForm(instance = user)
+            context['owner_name'] = 'igen-ftn'
             context['message'] = 'Your profile has been successfully updated!'
-            return render(request, 'igenapp/user_profile.html', context)
+            return render(request, 'igenapp/users/user_profile.html', context)
         else:
             context = dict()
             context['form'] = form
             context['message'] = 'Error updating profile info. Please check input data!'
             context['owner_name'] = 'igen-ftn'
-            return render(request, 'igenapp/user_profile.html', context)
+            return render(request, 'igenapp/users/user_profile.html', context)
     else:
-        user = request.user
-        context = dict()
-        context['form'] = UserEditForm(instance=user)
-        context['owner_name'] = 'igen-ftn'
-        #form = UserEditForm(initial = {'first_name': user.first_name, 'last_name': user.last_name, 'username': user.username, 'email': user.email})
-        return render(request, 'igenapp/user_profile.html', context)
+        if request.user.is_authenticated:
+            user = request.user
+            context = dict()
+            context['form'] = UserEditForm(instance=user)
+            context['owner_name'] = 'igen-ftn'
+            #form = UserEditForm(initial = {'first_name': user.first_name, 'last_name': user.last_name, 'username': user.username, 'email': user.email})
+
+            return render(request, 'igenapp/users/user_profile.html', context)
+        else:
+            return redirect('login')
 
 
 def logout_view(request):
