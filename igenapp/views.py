@@ -117,8 +117,11 @@ def issue_details(request, owner_name, repo_name, issue_id):
 
 def close(request, owner_name, repo_name, issue_id):
     issue = get_object_or_404(Issue, pk=issue_id)
-    print(issue)
-    issue.status = 'C'
+
+    if issue.status == 'O':
+        issue.status = 'C'
+    else:
+        issue.status = 'O'
     issue.save()
 
     issues_list = Issue.objects.order_by('-date')
