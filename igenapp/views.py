@@ -33,7 +33,7 @@ def wiki_form(request, owner_name, repo_name):
         form = WikiForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('wiki')
+            return redirect('wiki', owner_name, repo_name)
         else:
             context = dict()
             context['form'] = form
@@ -110,7 +110,8 @@ def add_issue(request, owner_name, repo_name, issue_id):
 
 def issue_details(request, owner_name, repo_name, issue_id):
     issue = get_object_or_404(Issue, pk=issue_id)
-    return render(request, 'igenapp/issues/issue_details.html', {'issue': issue,
+    comments = Comment.objects.filter(issue = issue).order_by('date')
+    return render(request, 'igenapp/issues/issue_details.html', {'issue': issue, 'comments': comments,
                                                                  'owner_name': owner_name, 'repo_name': repo_name})
 
 
@@ -329,3 +330,28 @@ def editUser(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+def add_comment(request, owner_name, repo_name, issue_id):
+    #user = request.user
+    if request.method == "POST":
+        comment = Comment()
+        comment.content = request.POST['content']
+        comment.user = request.user
+        comment.date = datetime.datetime.now()
+        comment.issue = Issue.objects.get(id=issue_id)
+        comment.save()
+        return redirect('issue_details', owner_name, repo_name, issue_id)
+
+def edit_comment(request, owner_name, repo_name, issue_id):
+    if request.method == "POST":
+        comment_id = request.POST['comment_id']
+        comment = Comment.objects.get(id=comment_id)
+        comment.content = request.POST['content']
+        comment.save()
+    return redirect('issue_details', owner_name, repo_name, issue_id)
+
+def delete_comment(request, owner_name, repo_name, issue_id, comment_id):
+    if request.method == "POST":
+        comment = Comment.objects.get(id=comment_id)
+        comment.delete()
+    return redirect('issue_details', owner_name, repo_name, issue_id)

@@ -77,3 +77,11 @@ class WikiPage(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=100)
     content = models.CharField(max_length=1000)
+
+class Comment(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(to=User, null=False)
+    issue = models.ForeignKey(to=Issue, null=True)
+    content = models.CharField(max_length=1000)
+    date = models.DateTimeField(null=True)
+

@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
-
+{% block head %}
+{% load staticfiles %}
+<script src="{% static 'igenapp/comment.js' %}"></script>
+{% endblock%}
 {% block navbar %}
     <li><a href="{% url 'home' owner_name %}">Home</a></li>
     <li><a href="/{{owner_name}}/repositories">Repositories</a></li>
@@ -38,4 +41,70 @@
         </div>
     </form>
 </div>
+<!-- comments -->
+{% for comment in comments %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-1">
+            <div class="thumbnail">
+                <img class="img-responsive user-photo" src="https://ssl.gstatic.com/accounts/ui/avatar_2x.png">
+            </div>
+        </div>
+        <div class="col-sm-5">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        {% if comment.user.username == user.username %}
+                            <form action="{% url 'delete_comment' owner_name repo_name issue.id comment.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-default glyphicon glyphicon-remove pull-right pagination-centered"></button>
+                            </form>
+                            <button class="btn btn-sm btn-default glyphicon glyphicon-pencil pull-right pagination-centered" onclick="editComment('{{comment.content}}', {{comment.id}}, '{{owner_name}}', '{{repo_name}}', {{issue.id}})"></button>
+                        {% endif %}
+                        <b>&nbsp; {{comment.user.username}}</b>
+                        <span class="text-muted pull-right">{{comment.date}}</span>
+                    </div>
+                </div>
+                <form method="post" action="{% url 'edit_comment' owner_name repo_name issue.id%}">
+                    {% csrf_token %}
+                    <div class="panel-body" id="editCom{{comment.id}}">
+                        {{comment.content}}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+<!-- write new comment -->
+{% if user.is_authenticated %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-1">
+                <div class="thumbnail">
+                    <img class="img-responsive user-photo" src="https://ssl.gstatic.com/accounts/ui/avatar_2x.png">
+                </div>
+            </div>
+            <div class="col-sm-5">
+                <form action="{% url 'add_comment' owner_name repo_name issue.id %}" method="post">
+                    {% csrf_token %}
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <strong>{{user.username}}</strong>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <textarea id="content" name="content" rows="4" class="form-control" placeholder="Write a comment.."></textarea>
+                            </div>
+                            <div class="row">
+                                <input type="Submit" class="pull-right btn btn-success" value="Comment"/>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
 {% endblock body %}
