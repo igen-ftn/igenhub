@@ -113,6 +113,7 @@
                         {{ user }} {% if forloop.last == False %} , {% endif %}
                     {% endfor %} </p>
                 {% endif %}
+                <p><b>Status:</b> {{issue.get_status_display}}</p>
             </div>
         </div>
     </div>

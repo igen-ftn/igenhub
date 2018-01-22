@@ -12,6 +12,7 @@ urlpatterns = [
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/add_issue/(?P<issue_id>\d+)/$', views.add_issue, name='add_issue'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/issues/(?P<issue_id>\d+)/$', views.issue_details, name='issue_details'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/issues/search/$', views.search, name='search'),
+    url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/issues/close/(?P<issue_id>\d+)/$', views.close, name='close'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/milestones/$', views.milestones, name='milestones'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/add_milestone/$', views.add_milestone, name='add_milestone'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/milestones/(?P<milestone_id>\d+)/$', views.remove_milestone, name='remove_milestone'),

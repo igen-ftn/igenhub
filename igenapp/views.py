@@ -115,6 +115,20 @@ def issue_details(request, owner_name, repo_name, issue_id):
                                                                  'owner_name': owner_name, 'repo_name': repo_name})
 
 
+def close(request, owner_name, repo_name, issue_id):
+    issue = get_object_or_404(Issue, pk=issue_id)
+    print(issue)
+    issue.status = 'C'
+    issue.save()
+
+    issues_list = Issue.objects.order_by('-date')
+    user_list = User.objects.all()  # DOBITI SAMO AUTORE
+    milestone_list = Milestone.objects.all()
+    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list,
+                                                          'milestones': milestone_list, 'owner_name': owner_name,
+                                                          'repo_name': repo_name})
+
+
 def search(request, owner_name, repo_name):
     author = request.POST.get('author')
     milestone = request.POST.get('milestone')
