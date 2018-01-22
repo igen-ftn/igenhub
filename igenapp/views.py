@@ -48,7 +48,10 @@ def wiki_form(request, owner_name, repo_name):
 
 def issues(request, owner_name, repo_name):
     issues_list = Issue.objects.order_by('-date')
-    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'owner_name': owner_name, 'repo_name': repo_name})
+    user_list = User.objects.all() #DOBITI SAMO AUTORE
+    milestone_list = Milestone.objects.all()
+    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list, 'milestones': milestone_list,
+                                                          'owner_name': owner_name, 'repo_name': repo_name})
 
 
 def new_issue(request, owner_name, repo_name, issue_id):
@@ -98,14 +101,36 @@ def add_issue(request, owner_name, repo_name, issue_id):
         form = IssueForm()
 
     issues_list = Issue.objects.order_by('-date')
-    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list,
-                                                          'owner_name': owner_name, 'repo_name': repo_name})
+    user_list = User.objects.all()  # DOBITI SAMO AUTORE
+    milestone_list = Milestone.objects.all()
+    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list,
+                                                          'milestones': milestone_list, 'owner_name': owner_name,
+                                                          'repo_name': repo_name})
 
 
 def issue_details(request, owner_name, repo_name, issue_id):
     issue = get_object_or_404(Issue, pk=issue_id)
     return render(request, 'igenapp/issues/issue_details.html', {'issue': issue,
                                                                  'owner_name': owner_name, 'repo_name': repo_name})
+
+
+def search(request, owner_name, repo_name):
+    author = request.POST.get('author')
+    milestone = request.POST.get('milestone')
+    status = request.POST.get('status')
+
+    issues_list = Issue.objects.order_by('-date')
+    if author != 'null':
+        issues_list = issues_list.filter(user=author)
+    if milestone != 'null':
+        issues_list = issues_list.filter(milestone=milestone)
+    if status != 'null':
+        issues_list = issues_list.filter(status=status)
+
+    user_list = User.objects.all()  # DOBITI SAMO AUTORE
+    milestone_list = Milestone.objects.all()
+    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list,
+                                    'milestones': milestone_list, 'owner_name': owner_name, 'repo_name': repo_name})
 
 
 def milestones(request, owner_name, repo_name):
