@@ -33,7 +33,7 @@ def wiki_form(request, owner_name, repo_name):
         form = WikiForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('wiki')
+            return redirect('wiki', owner_name, repo_name)
         else:
             context = dict()
             context['form'] = form
