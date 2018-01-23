@@ -250,3 +250,7 @@ def editUser(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+
+def landing(request):
+    return render(request, 'igenapp/landingpage.html')

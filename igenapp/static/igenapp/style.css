@@ -146,3 +146,14 @@ th, td{
 .mt {
     margin-top: 3px;
 }
+
+.landing-link {
+  background-color: #5191f7;
+  padding: 4em;
+  border-radius: 10px;
+  color: white !important;
+}
+
+.landing-link:hover {
+  box-shadow: 4px 4px 8px grey;
+}

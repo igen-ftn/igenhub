@@ -25,6 +25,7 @@ urlpatterns = [
     url(r'^accounts/profile/$', views.editUser, name='editUser'),
     url(r'^login/$', auth_views.login, name='login'),
     url(r'^logout/$', views.logout_view, name='logout'),
-    url(r'^(?P<owner_name>[\w-]+)/$', views.home, name='home')
+    url(r'^(?P<owner_name>[\w-]+)/$', views.home, name='home'),
+    url(r'^', views.landing, name='landing')
               ]
 
