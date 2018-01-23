@@ -205,9 +205,9 @@ def remove_label(request, owner_name, repo_name, label_id):
 
 
 def commits(request, owner_name, repo_name):
-    if owner_name == request.user.username:
-        return render(request, 'igenapp/commits/commits.html',
-                      {'repo_info': {'owner_name': owner_name, 'repo_name': repo_name}})
+    #if owner_name == request.user.username:
+        #return render(request, 'igenapp/commits/commits.html',
+                      #{'repo_info': {'owner_name': owner_name, 'repo_name': repo_name}})
 
     result = requests.get('https://api.github.com/repos/%s/%s/commits' % (owner_name, repo_name))
     commits = json.loads(result.content)
@@ -322,21 +322,21 @@ def editUser(request):
             user.save()
             context = dict()
             context['form'] = UserEditForm(instance = user)
-            context['owner_name'] = 'igen-ftn'
+            context['owner_name'] = user.username
             context['message'] = 'Your profile has been successfully updated!'
             return render(request, 'igenapp/users/user_profile.html', context)
         else:
             context = dict()
             context['form'] = form
             context['message'] = 'Error updating profile info. Please check input data!'
-            context['owner_name'] = 'igen-ftn'
+            context['owner_name'] = user.username
             return render(request, 'igenapp/users/user_profile.html', context)
     else:
         if request.user.is_authenticated:
             user = request.user
             context = dict()
             context['form'] = UserEditForm(instance=user)
-            context['owner_name'] = 'igen-ftn'
+            context['owner_name'] = user.username
             #form = UserEditForm(initial = {'first_name': user.first_name, 'last_name': user.last_name, 'username': user.username, 'email': user.email})
 
             return render(request, 'igenapp/users/user_profile.html', context)
@@ -347,6 +347,7 @@ def editUser(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
 
 def add_comment(request, owner_name, repo_name, issue_id):
     #user = request.user
@@ -372,3 +373,8 @@ def delete_comment(request, owner_name, repo_name, issue_id, comment_id):
         comment = Comment.objects.get(id=comment_id)
         comment.delete()
     return redirect('issue_details', owner_name, repo_name, issue_id)
+
+
+def landing(request, owner_name, repo_name):
+    return render(request, 'igenapp/landingpage.html', owner_name, repo_name)
+
