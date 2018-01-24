@@ -51,6 +51,32 @@ def wiki_page(request, owner_name, repo_name, wikipage_id):
     return render(request, 'igenapp/wiki/page.html', {'wiki': wikipage,
                                                                  'owner_name': owner_name, 'repo_name': repo_name})
 
+def remove_wikipage(request, owner_name, repo_name, wikipage_id):
+    WikiPage.objects.filter(pk=wikipage_id).delete()
+    wikipage_list = WikiPage.objects.all()
+    #return render(request, 'igenapp/wiki.html', {'wikipages': wikipages_list, 'owner_name': owner_name, 'repo_name': repo_name})
+    return redirect('wiki', owner_name, repo_name)
+
+def edit_wikipage(request, owner_name, repo_name, wikipage_id):
+    if request.method == "POST":
+        # .first() at the end turns the object into instance
+        wikipage = WikiPage.objects.filter(pk=wikipage_id).first()
+        form = WikiForm(request.POST, instance=wikipage)
+        if form.is_valid():
+
+            form.save()
+            return redirect('wiki', owner_name, repo_name)
+        else:
+            context = dict()
+            context['form'] = form
+            context['message'] = "Error has occured:"
+            context['owner_name'] = owner_name
+            context['repo_name'] = repo_name
+            return render(request, 'igenapp/wiki/form.html', context)
+    else:
+        wikipage = WikiPage.objects.filter(pk=wikipage_id).first()
+        form = WikiForm(instance=wikipage)
+        return render(request, 'igenapp/wiki/form.html', {'form': form, 'owner_name': owner_name, 'repo_name': repo_name})
 
 def issues(request, owner_name, repo_name):
     issues_list = Issue.objects.order_by('-date')
@@ -383,4 +409,3 @@ def delete_comment(request, owner_name, repo_name, issue_id, comment_id):
 
 def landing(request, owner_name, repo_name):
     return render(request, 'igenapp/landingpage.html', owner_name, repo_name)
-

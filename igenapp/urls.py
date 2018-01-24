@@ -8,6 +8,8 @@ urlpatterns = [
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/wiki/$', views.wiki, name='wiki'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/wiki-form/$', views.wiki_form, name='wiki-form'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/wiki-page/(?P<wikipage_id>\d+)/$', views.wiki_page, name='wiki-page'),
+    url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/wiki-remove/(?P<wikipage_id>\d+)/$', views.remove_wikipage, name='remove-wikipage'),
+    url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/wiki-edit/(?P<wikipage_id>\d+)/$', views.edit_wikipage, name='edit-wikipage'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/issues/$', views.issues, name='issues'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/issue/(?P<issue_id>\d+)/$', views.new_issue, name='new_issue'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/add_issue/(?P<issue_id>\d+)/$', views.add_issue, name='add_issue'),
@@ -36,4 +38,3 @@ urlpatterns = [
     url(r'^(?P<owner_name>[\w-]+)/$', views.home, name='home'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/$', views.landing, name='landing')
               ]
-
