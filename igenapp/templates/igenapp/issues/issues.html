@@ -26,6 +26,58 @@
     </div>
 </div>
 <br/>
+<!--SEARCH-->
+<div class="row">
+    <div class="col-sm-8">
+        <div style="width: 90%;">
+            <div id="filter-panel" class="collapse filter-panel">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <form class="form-inline" action="/{{owner_name}}/{{repo_name}}/issues/search/" method="POST">{% csrf_token %}
+                            <div class="form-group">
+                                <label class="filter-col" style="margin-right:10px;">Author:</label>
+                                <select class="form-control" name="author">
+                                    <option value="null"></option>
+                                    {% for user in users %}
+                                    <option value="{{user.id}}">{{user}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="filter-col" style="margin-right:10px;margin-left:10px;">Milestone:</label>
+                                <select class="form-control" name="milestone">
+                                    <option value="null"></option>
+                                    {% for milestone in milestones %}
+                                    <option value="{{milestone.id}}">{{milestone.title}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="filter-col" style="margin-right:10px;margin-left:10px;">Status:</label>
+                                <select class="form-control" name="status">
+                                    <option value="null"></option>
+                                    <option value="O">Open</option>
+                                    <option value="C">Closed</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit">
+                                    <span class="glyphicon glyphicon-search"></span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary" style="background-color: #a2abb3;border-color: #868b90"
+                    data-toggle="collapse" data-target="#filter-panel">
+                <span class="glyphicon glyphicon-cog"></span> Search
+            </button>
+        </div>
+	</div>
+</div>
+<!--ISSUES-->
+<br/>
 <div class="row">
     {% for issue in issues %}
     <div class="col-sm-8">
@@ -61,6 +113,7 @@
                         {{ user }} {% if forloop.last == False %} , {% endif %}
                     {% endfor %} </p>
                 {% endif %}
+                <p><b>Status:</b> {{issue.get_status_display}}</p>
             </div>
         </div>
     </div>

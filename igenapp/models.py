@@ -20,6 +20,20 @@ class RepositoryInfo:
         self.selected_branch = selected_branch
 
 
+class Repository(models.Model):
+    id = models.AutoField(primary_key=True)
+    author = models.ForeignKey(User)
+    repo_name = models.CharField(max_length=70)
+    owner_name = models.CharField(max_length=70)
+    TYPE_CHOICE = (
+        ('L', 'Local'),
+        ('G', 'Git')
+    )
+    type = models.CharField(max_length=1, choices=TYPE_CHOICE, default='L')
+    url = models.CharField(max_length=150, default='')
+    contributors = models.ManyToManyField(User, related_name='contributors')
+
+
 class Label(models.Model):
 
     id = models.AutoField(primary_key=True)
@@ -63,3 +77,11 @@ class WikiPage(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=100)
     content = models.CharField(max_length=1000)
+
+class Comment(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(to=User, null=False)
+    issue = models.ForeignKey(to=Issue, null=True)
+    content = models.CharField(max_length=1000)
+    date = models.DateTimeField(null=True)
+

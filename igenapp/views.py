@@ -33,7 +33,7 @@ def wiki_form(request, owner_name, repo_name):
         form = WikiForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('wiki')
+            return redirect('wiki', owner_name, repo_name)
         else:
             context = dict()
             context['form'] = form
@@ -54,7 +54,10 @@ def wiki_page(request, owner_name, repo_name, wikipage_id):
 
 def issues(request, owner_name, repo_name):
     issues_list = Issue.objects.order_by('-date')
-    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'owner_name': owner_name, 'repo_name': repo_name})
+    user_list = User.objects.all() #DOBITI SAMO AUTORE
+    milestone_list = Milestone.objects.all()
+    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list, 'milestones': milestone_list,
+                                                          'owner_name': owner_name, 'repo_name': repo_name})
 
 
 def new_issue(request, owner_name, repo_name, issue_id):
@@ -104,14 +107,54 @@ def add_issue(request, owner_name, repo_name, issue_id):
         form = IssueForm()
 
     issues_list = Issue.objects.order_by('-date')
-    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list,
-                                                          'owner_name': owner_name, 'repo_name': repo_name})
+    user_list = User.objects.all()  # DOBITI SAMO AUTORE
+    milestone_list = Milestone.objects.all()
+    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list,
+                                                          'milestones': milestone_list, 'owner_name': owner_name,
+                                                          'repo_name': repo_name})
 
 
 def issue_details(request, owner_name, repo_name, issue_id):
     issue = get_object_or_404(Issue, pk=issue_id)
-    return render(request, 'igenapp/issues/issue_details.html', {'issue': issue,
+    comments = Comment.objects.filter(issue = issue).order_by('date')
+    return render(request, 'igenapp/issues/issue_details.html', {'issue': issue, 'comments': comments,
                                                                  'owner_name': owner_name, 'repo_name': repo_name})
+
+
+def close(request, owner_name, repo_name, issue_id):
+    issue = get_object_or_404(Issue, pk=issue_id)
+
+    if issue.status == 'O':
+        issue.status = 'C'
+    else:
+        issue.status = 'O'
+    issue.save()
+
+    issues_list = Issue.objects.order_by('-date')
+    user_list = User.objects.all()  # DOBITI SAMO AUTORE
+    milestone_list = Milestone.objects.all()
+    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list,
+                                                          'milestones': milestone_list, 'owner_name': owner_name,
+                                                          'repo_name': repo_name})
+
+
+def search(request, owner_name, repo_name):
+    author = request.POST.get('author')
+    milestone = request.POST.get('milestone')
+    status = request.POST.get('status')
+
+    issues_list = Issue.objects.order_by('-date')
+    if author != 'null':
+        issues_list = issues_list.filter(user=author)
+    if milestone != 'null':
+        issues_list = issues_list.filter(milestone=milestone)
+    if status != 'null':
+        issues_list = issues_list.filter(status=status)
+
+    user_list = User.objects.all()  # DOBITI SAMO AUTORE
+    milestone_list = Milestone.objects.all()
+    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list,
+                                    'milestones': milestone_list, 'owner_name': owner_name, 'repo_name': repo_name})
 
 
 def milestones(request, owner_name, repo_name):
@@ -168,6 +211,10 @@ def remove_label(request, owner_name, repo_name, label_id):
 
 
 def commits(request, owner_name, repo_name):
+    #if owner_name == request.user.username:
+        #return render(request, 'igenapp/commits/commits.html',
+                      #{'repo_info': {'owner_name': owner_name, 'repo_name': repo_name}})
+
     result = requests.get('https://api.github.com/repos/%s/%s/commits' % (owner_name, repo_name))
     commits = json.loads(result.content)
 
@@ -198,7 +245,57 @@ def selected_branch(request, owner_name, repo_name):
 
 
 def repositories(request, owner_name):
-    return render(request, 'igenapp/repository/repository.html', {'owner_name': owner_name})
+    repositories = Repository.objects.filter(author=request.user).all()
+
+    return render(request, 'igenapp/repository/repository.html',
+                  {'repositories': repositories, 'owner_name': request.user.username})
+
+
+def new_repository(request, owner_name):
+    users = User.objects.all().exclude(username=owner_name)
+    return render(request, 'igenapp/repository/new_repository.html', {'users': users, 'owner_name': owner_name})
+
+
+def add_repository(request, owner_name):
+    if request.method == "POST":
+        error = True
+        repo_type = request.POST.get('repo_type')
+        if repo_type == "local":
+            form = LocalRepositoryForm(request.POST)
+            if form.is_valid():
+                repository = Repository(author=request.user, repo_name=form.cleaned_data['repo_name'],
+                                        owner_name=request.user.username, type='L')
+                repository.save()
+                contributors = request.POST.getlist('contributors')
+                repository.contributors.clear()
+                for contributor in contributors:
+                    repository.contributors.add(contributor)
+                repository.save()
+                error = False
+        elif repo_type == "git":
+            form = GitRepositoryForm(request.POST)
+            if form.is_valid():
+                repo_url = form.cleaned_data['repo_url']
+                if not repo_url.endswith(".git"):
+                    return redirect('/' + owner_name + '/new_repository')
+                owner_repo_name = repo_url[repo_url.rfind("/", 0, repo_url.rfind("/"))+1:repo_url.rfind("/")]
+                repo_name = repo_url[repo_url.rfind("/")+1:-4]
+                repository = Repository(author=request.user, repo_name=repo_name,
+                                        owner_name=owner_repo_name, type='G', url=repo_url)
+                repository.save()
+                contributors = request.POST.getlist('contributors')
+                repository.contributors.clear()
+                for contributor in contributors:
+                    repository.contributors.add(contributor)
+                repository.save()
+                error = False
+
+        if error:
+            return redirect('/' + owner_name + '/new_repository')
+
+        return redirect('/'+owner_name+'/repositories')
+    else:
+        return redirect('/' + owner_name + '/new_repository')
 
 
 def signup(request):
@@ -231,21 +328,21 @@ def editUser(request):
             user.save()
             context = dict()
             context['form'] = UserEditForm(instance = user)
-            context['owner_name'] = 'igen-ftn'
+            context['owner_name'] = user.username
             context['message'] = 'Your profile has been successfully updated!'
             return render(request, 'igenapp/users/user_profile.html', context)
         else:
             context = dict()
             context['form'] = form
             context['message'] = 'Error updating profile info. Please check input data!'
-            context['owner_name'] = 'igen-ftn'
+            context['owner_name'] = user.username
             return render(request, 'igenapp/users/user_profile.html', context)
     else:
         if request.user.is_authenticated:
             user = request.user
             context = dict()
             context['form'] = UserEditForm(instance=user)
-            context['owner_name'] = 'igen-ftn'
+            context['owner_name'] = user.username
             #form = UserEditForm(initial = {'first_name': user.first_name, 'last_name': user.last_name, 'username': user.username, 'email': user.email})
 
             return render(request, 'igenapp/users/user_profile.html', context)
@@ -256,3 +353,34 @@ def editUser(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+
+def add_comment(request, owner_name, repo_name, issue_id):
+    #user = request.user
+    if request.method == "POST":
+        comment = Comment()
+        comment.content = request.POST['content']
+        comment.user = request.user
+        comment.date = datetime.datetime.now()
+        comment.issue = Issue.objects.get(id=issue_id)
+        comment.save()
+        return redirect('issue_details', owner_name, repo_name, issue_id)
+
+def edit_comment(request, owner_name, repo_name, issue_id):
+    if request.method == "POST":
+        comment_id = request.POST['comment_id']
+        comment = Comment.objects.get(id=comment_id)
+        comment.content = request.POST['content']
+        comment.save()
+    return redirect('issue_details', owner_name, repo_name, issue_id)
+
+def delete_comment(request, owner_name, repo_name, issue_id, comment_id):
+    if request.method == "POST":
+        comment = Comment.objects.get(id=comment_id)
+        comment.delete()
+    return redirect('issue_details', owner_name, repo_name, issue_id)
+
+
+def landing(request, owner_name, repo_name):
+    return render(request, 'igenapp/landingpage.html', owner_name, repo_name)
+

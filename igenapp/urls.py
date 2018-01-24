@@ -12,6 +12,8 @@ urlpatterns = [
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/issue/(?P<issue_id>\d+)/$', views.new_issue, name='new_issue'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/add_issue/(?P<issue_id>\d+)/$', views.add_issue, name='add_issue'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/issues/(?P<issue_id>\d+)/$', views.issue_details, name='issue_details'),
+    url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/issues/search/$', views.search, name='search'),
+    url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/issues/close/(?P<issue_id>\d+)/$', views.close, name='close'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/milestones/$', views.milestones, name='milestones'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/add_milestone/$', views.add_milestone, name='add_milestone'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/milestones/(?P<milestone_id>\d+)/$', views.remove_milestone, name='remove_milestone'),
@@ -22,10 +24,16 @@ urlpatterns = [
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/commit/(?P<commit_id>[\w-]+)/$', views.commit, name='commit'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/selected_branch/$', views.selected_branch, name='selected_branch'),
     url(r'^^(?P<owner_name>[\w-]+)/repositories/$', views.repositories, name='repositories'),
+    url(r'^^(?P<owner_name>[\w-]+)/new_repository/$', views.new_repository, name='new_repository'),
+    url(r'^^(?P<owner_name>[\w-]+)/add_repository/$', views.add_repository, name='add_repository'),
+    url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/issues/(?P<issue_id>\d+)/comments/$', views.add_comment, name='add_comment'),
+    url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/issues/(?P<issue_id>\d+)/comments/edit/$', views.edit_comment, name='edit_comment'),
+    url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/issues/(?P<issue_id>\d+)/comments/delete/(?P<comment_id>\d+)/$', views.delete_comment, name='delete_comment'),
     url(r'^signup/$', views.signup, name='signup'),
     url(r'^accounts/profile/$', views.editUser, name='editUser'),
     url(r'^login/$', auth_views.login, name='login'),
     url(r'^logout/$', views.logout_view, name='logout'),
-    url(r'^(?P<owner_name>[\w-]+)/$', views.home, name='home')
+    url(r'^(?P<owner_name>[\w-]+)/$', views.home, name='home'),
+    url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/$', views.landing, name='landing')
               ]
 
