@@ -18,8 +18,11 @@ def index(request):
     return render(request, 'igenapp/index.html')
 
 
-def home(request, owner_name):
-    return render(request, 'igenapp/home.html', {'owner_name': owner_name})
+def home(request, owner_name=''):
+    if owner_name:
+        return render(request, 'igenapp/home.html', {'owner_name': owner_name})
+    else:
+        return render(request, 'igenapp/home.html', {'owner_name': ''})
 
 
 def wiki(request, owner_name, repo_name):
