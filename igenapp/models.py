@@ -82,6 +82,7 @@ class Comment(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(to=User, null=False)
     issue = models.ForeignKey(to=Issue, null=True)
+    wiki = models.ForeignKey(to=WikiPage, null=True)
     content = models.CharField(max_length=1000)
     date = models.DateTimeField(null=True)
 

@@ -48,7 +48,8 @@ def wiki_form(request, owner_name, repo_name):
 
 def wiki_page(request, owner_name, repo_name, wikipage_id):
     wikipage = get_object_or_404(WikiPage, pk=wikipage_id)
-    return render(request, 'igenapp/wiki/page.html', {'wiki': wikipage,
+    comments = Comment.objects.filter(wiki=wikipage).order_by('date')
+    return render(request, 'igenapp/wiki/page.html', {'wiki': wikipage, 'comments': comments,
                                                                  'owner_name': owner_name, 'repo_name': repo_name})
 
 def remove_wikipage(request, owner_name, repo_name, wikipage_id):
@@ -381,30 +382,45 @@ def logout_view(request):
     return redirect('login')
 
 
-def add_comment(request, owner_name, repo_name, issue_id):
-    #user = request.user
+def add_comment(request, owner_name, repo_name, parent, parent_id):
     if request.method == "POST":
-        comment = Comment()
-        comment.content = request.POST['content']
-        comment.user = request.user
-        comment.date = datetime.datetime.now()
-        comment.issue = Issue.objects.get(id=issue_id)
-        comment.save()
-        return redirect('issue_details', owner_name, repo_name, issue_id)
+        if parent == 'issue':
+            comment = Comment()
+            comment.content = request.POST['content']
+            comment.user = request.user
+            comment.date = datetime.datetime.now()
+            comment.issue = Issue.objects.get(id=parent_id)
+            comment.save()
+            return redirect('issue_details', owner_name, repo_name, parent_id)
+        else:
+            comment = Comment()
+            comment.content = request.POST['content']
+            comment.user = request.user
+            comment.date = datetime.datetime.now()
+            comment.wiki = WikiPage.objects.get(id=parent_id)
+            comment.save()
+            return redirect('wiki-page', owner_name, repo_name, parent_id)
 
-def edit_comment(request, owner_name, repo_name, issue_id):
+
+def edit_comment(request, owner_name, repo_name, parent, parent_id):
     if request.method == "POST":
         comment_id = request.POST['comment_id']
         comment = Comment.objects.get(id=comment_id)
         comment.content = request.POST['content']
         comment.save()
-    return redirect('issue_details', owner_name, repo_name, issue_id)
+        if parent == 'issue':
+            return redirect('issue_details', owner_name, repo_name, parent_id)
+        else:
+            return redirect('wiki-page', owner_name, repo_name, parent_id)
 
-def delete_comment(request, owner_name, repo_name, issue_id, comment_id):
+def delete_comment(request, owner_name, repo_name, parent, parent_id, comment_id):
     if request.method == "POST":
         comment = Comment.objects.get(id=comment_id)
         comment.delete()
-    return redirect('issue_details', owner_name, repo_name, issue_id)
+        if parent == 'issue':
+            return redirect('issue_details', owner_name, repo_name, parent_id)
+        else:
+            return redirect('wiki-page', owner_name, repo_name, parent_id)
 
 
 def landing(request, owner_name, repo_name):
