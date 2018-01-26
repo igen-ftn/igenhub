@@ -35,14 +35,12 @@ class Repository(models.Model):
 
 
 class Label(models.Model):
-
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=20)
     color = models.CharField(max_length=7)
 
 
 class Milestone(models.Model):
-
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=500)
@@ -55,8 +53,14 @@ class Milestone(models.Model):
     status = models.CharField(max_length=1, choices=STATUS_CHOICE, default='O')
 
 
-class Issue(models.Model):
+class IssueHistory(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User)
+    text = models.CharField(max_length=50)
+    date = models.DateTimeField()
 
+
+class Issue(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=100)
     text = models.CharField(max_length=500)
@@ -67,16 +71,18 @@ class Issue(models.Model):
         ('C', 'Closed'),
     )
     status = models.CharField(max_length=1, choices=STATUS_CHOICE, default='O')
-    #comments
+    history = models.ManyToManyField(IssueHistory)
     user = models.ForeignKey(User)
     assignee = models.ManyToManyField(User, related_name='issue_assignees')
     label = models.ManyToManyField(Label)
     milestone = models.ForeignKey(Milestone, default=None, blank=True, null=True)
 
+
 class WikiPage(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=100)
     content = models.CharField(max_length=1000)
+
 
 class Comment(models.Model):
     id = models.AutoField(primary_key=True)

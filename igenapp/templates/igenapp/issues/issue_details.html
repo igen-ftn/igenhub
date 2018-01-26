@@ -46,6 +46,15 @@
         </div>
     </form>
 </div>
+<br/>
+<div style="width:70%; margin-left:100px">
+    {% for history in issue.history.all %}
+    <p><span class="glyphicon glyphicon-user"></span> <b>{{history.user}}</b> <i>{{history.text}} </i>
+        &nbsp;&nbsp;<span class="glyphicon glyphicon-calendar"></span>&nbsp;{{history.date}}
+    </p>
+    {% endfor %}
+</div>
+<br/>
 <!-- comments -->
 {% for comment in comments %}
 <div class="container">

@@ -82,6 +82,7 @@ def edit_wikipage(request, owner_name, repo_name, wikipage_id):
         form = WikiForm(instance=wikipage)
         return render(request, 'igenapp/wiki/form.html', {'form': form, 'owner_name': owner_name, 'repo_name': repo_name})
 
+
 def issues(request, owner_name, repo_name):
     issues_list = Issue.objects.order_by('-date')
     user_list = User.objects.all() #DOBITI SAMO AUTORE
@@ -110,6 +111,8 @@ def add_issue(request, owner_name, repo_name, issue_id):
         form = IssueForm(request.POST)
         if form.is_valid():
             if int(issue_id) != 0:
+                issue_history(request, form, issue_id)
+
                 Issue.objects.filter(pk=issue_id).update(title=form.cleaned_data['title'],
                                                          text=form.cleaned_data['text'], ordinal=1, status='O')
                 issue = get_object_or_404(Issue, pk=issue_id)
@@ -124,15 +127,9 @@ def add_issue(request, owner_name, repo_name, issue_id):
                 milestone = get_object_or_404(Milestone, pk=form.cleaned_data['milestone'])
                 issue.milestone = milestone
                 issue.save()
-            labels = request.POST.getlist('label')
-            issue.label.clear()
-            for label in labels:
-                issue.label.add(label)
-            assignees = request.POST.getlist('assignees')
-            issue.assignee.clear()
-            for assignee in assignees:
-                issue.assignee.add(assignee)
-            issue.save()
+
+            issue_labels(request, issue)
+            issue_assignees(request, issue)
     else:
         form = IssueForm()
 
@@ -142,6 +139,70 @@ def add_issue(request, owner_name, repo_name, issue_id):
     return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list,
                                                           'milestones': milestone_list, 'owner_name': owner_name,
                                                           'repo_name': repo_name})
+
+
+def issue_labels(request, issue):
+    label_list = request.POST.getlist('label')
+    added_labels = [c for c in list(map(int, label_list)) if c not in
+                    list(issue.label.all().values_list('id', flat=True))]
+    if added_labels:
+        for lab in added_labels:
+            added_label = get_object_or_404(Label, pk=lab)
+            create_history(request, ' added label ' + added_label.name, issue)
+            issue.label.add(added_label)
+    removed_labels = [c for c in list(issue.label.all().values_list('id', flat=True)) if c not in
+                      list(map(int, label_list))]
+    if removed_labels:
+        for lab in removed_labels:
+            removed_label = get_object_or_404(Label, pk=lab)
+            create_history(request, ' removed label ' + removed_label.name, issue)
+            issue.label.remove(removed_label)
+    issue.save()
+
+
+def issue_assignees(request, issue):
+    assignee_list = request.POST.getlist('assignees')
+    added_assignees = [c for c in list(map(int, assignee_list)) if c not in
+                       list(issue.assignee.all().values_list('id', flat=True))]
+    if added_assignees:
+        for assignee in added_assignees:
+            added_assignee = get_object_or_404(User, pk=assignee)
+            create_history(request, ' assigned ' + added_assignee.username, issue)
+            issue.assignee.add(added_assignee)
+    removed_assignees = [c for c in list(issue.assignee.all().values_list('id', flat=True)) if c not in
+                         list(map(int, assignee_list))]
+    if removed_assignees:
+        for assignee in removed_assignees:
+            removed_assignee = get_object_or_404(User, pk=assignee)
+            create_history(request, ' removed assignee ' + removed_assignee.username, issue)
+            issue.assignee.remove(removed_assignee)
+    issue.save()
+
+
+def issue_history(request, form, issue_id):
+    issue = get_object_or_404(Issue, pk=issue_id)
+    if issue.title != form.cleaned_data['title']:
+        create_history(request, ' changed title to ' + form.cleaned_data['title'], issue)
+    if issue.text != form.cleaned_data['text']:
+        create_history(request, ' changed description: ' + form.cleaned_data['text'], issue)
+    if issue.milestone is not None:
+        if str(issue.milestone.id) != form.cleaned_data['milestone']:
+            if form.cleaned_data['milestone'] != 'null':
+                milestone = get_object_or_404(Milestone, pk=form.cleaned_data['milestone'])
+                create_history(request, ' changed milestone from ' + issue.milestone.title + ' to ' + milestone.title,
+                               issue)
+            else:
+                create_history(request, ' removed milestone', issue)
+    else:
+        if form.cleaned_data['milestone'] != 'null':
+            milestone = get_object_or_404(Milestone, pk=form.cleaned_data['milestone'])
+            create_history(request, ' added milestone: ' + milestone.title, issue)
+
+
+def create_history(request, text, issue):
+    new_history = IssueHistory.objects.create(user=request.user, text=text, date=datetime.datetime.now())
+    issue.history.add(new_history)
+    issue.save()
 
 
 def issue_details(request, owner_name, repo_name, issue_id):
@@ -156,8 +217,10 @@ def close(request, owner_name, repo_name, issue_id):
 
     if issue.status == 'O':
         issue.status = 'C'
+        create_history(request, ' closed issue ', issue)
     else:
         issue.status = 'O'
+        create_history(request, ' reopened issue ', issue)
     issue.save()
 
     issues_list = Issue.objects.order_by('-date')
