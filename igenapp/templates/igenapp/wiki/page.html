@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block body %}
-<div>
+<div class="row">
   <div class="row">
     <div class="col-md-8">
       <h2>{{wiki.title}}</h2>
@@ -25,8 +25,9 @@
       </div>
     </div>
   </div>
-
-  <p>{{wiki.content}}</p>
+    <div class="col-md-12 col-lg-11 container panel row">
+        <p class="col-md-12 col-lg-11" style="word-break: break-all">{{wiki.content}}</p>
+    </div>
 </div>
 
 <!-- comments -->
