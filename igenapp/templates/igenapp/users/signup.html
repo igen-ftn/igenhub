@@ -7,7 +7,7 @@
 {% block body %}
     <h3>Sign Up:</h3>
     <p>{{message}}</p>
-    <form method = "POST" class="post-form">
+    <form method = "POST" class="post-form" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.management_form}}
         {{form.errors}}
@@ -16,6 +16,7 @@
         <br/>
         <table>
             {{ form.as_table }}
+            {{ image.as_table }}
             <tr>
                 <td>
                     &nbsp;

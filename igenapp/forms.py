@@ -58,3 +58,8 @@ class WikiForm(forms.ModelForm):
     class Meta:
         model = WikiPage
         fields = '__all__'
+
+class ImageForm(forms.ModelForm):
+    class Meta:
+        model = UserImage
+        fields = ['avatar']

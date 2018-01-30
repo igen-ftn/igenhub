@@ -92,3 +92,6 @@ class Comment(models.Model):
     content = models.CharField(max_length=1000)
     date = models.DateTimeField(null=True)
 
+class UserImage(models.Model):
+    user = models.OneToOneField(to=User, null=False, blank=True, primary_key=True, to_field='id')
+    avatar = models.ImageField(upload_to='avatars', blank=True)

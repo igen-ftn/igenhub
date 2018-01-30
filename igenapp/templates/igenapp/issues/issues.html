@@ -84,7 +84,11 @@
         <div class="panel panel-white post panel-shadow">
             <div class="post-heading">
                 <div class="pull-left image">
-                    <img src="http://bootdey.com/img/Content/user_1.jpg" class="img-circle avatar" alt="user profile image">
+                    {% for image in images %}
+                        {% if image.user == issue.user %}
+                            <img src="{{image.avatar.url}}" class="img-circle avatar" alt="profile picture" />
+                        {% endif %}
+                    {% endfor %}
                 </div>
                 <div class="pull-left meta">
                     <div class="title h5">

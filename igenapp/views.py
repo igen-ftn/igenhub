@@ -86,23 +86,25 @@ def edit_wikipage(request, owner_name, repo_name, wikipage_id):
 def issues(request, owner_name, repo_name):
     issues_list = Issue.objects.order_by('-date')
     user_list = User.objects.all() #DOBITI SAMO AUTORE
+    images = UserImage.objects.all()
     milestone_list = Milestone.objects.all()
-    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list, 'milestones': milestone_list,
-                                                          'owner_name': owner_name, 'repo_name': repo_name})
+    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list, 'milestones': milestone_list, 'images':images,
+                                                          'owner_name': owner_name, 'repo_name': repo_name })
 
 
 def new_issue(request, owner_name, repo_name, issue_id):
     milestone_list = Milestone.objects.all()
     label_list = Label.objects.all()
     users = User.objects.all()
+    images = UserImage.objects.all()
     try:
         issue = Issue.objects.get(pk=issue_id)
         return render(request, 'igenapp/issues/new_issue.html', {'labels': label_list, 'milestones': milestone_list,
-                                                                 'issue': issue, 'users': users,
+                                                                 'issue': issue, 'users': users, 'images':images,
                                                                  'owner_name': owner_name, 'repo_name': repo_name})
     except Issue.DoesNotExist:
         return render(request, 'igenapp/issues/new_issue.html', {'labels': label_list, 'milestones': milestone_list,
-                                                                 'users': users,
+                                                                 'users': users, 'images':images,
                                                                  'owner_name': owner_name, 'repo_name': repo_name})
 
 
@@ -136,7 +138,8 @@ def add_issue(request, owner_name, repo_name, issue_id):
     issues_list = Issue.objects.order_by('-date')
     user_list = User.objects.all()  # DOBITI SAMO AUTORE
     milestone_list = Milestone.objects.all()
-    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list,
+    images = UserImage.objects.all()
+    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list, 'images':images,
                                                           'milestones': milestone_list, 'owner_name': owner_name,
                                                           'repo_name': repo_name})
 
@@ -399,6 +402,10 @@ def signup(request):
             password = form.cleaned_data['password']
             user.set_password(password)
             user.save()
+            image = UserImage()
+            image.avatar = request.FILES['avatar']
+            image.user = User.objects.get(username=user.username)
+            image.save()
             return redirect('login')
         else:
             context = dict()
@@ -407,7 +414,8 @@ def signup(request):
             return render(request, 'igenapp/users/signup.html', context)
     else:
         form = UserForm()
-        return render(request, 'igenapp/users/signup.html', {'form':form})
+        image = ImageForm()
+        return render(request, 'igenapp/users/signup.html', {'form':form, 'image':image})
 
 
 def editUser(request):
@@ -435,6 +443,9 @@ def editUser(request):
             user = request.user
             context = dict()
             context['form'] = UserEditForm(instance=user)
+            image = UserImage.objects.get(user = user)
+            print(image.user.username)
+            context['image'] = image
             context['owner_name'] = user.username
             #form = UserEditForm(initial = {'first_name': user.first_name, 'last_name': user.last_name, 'username': user.username, 'email': user.email})
 
