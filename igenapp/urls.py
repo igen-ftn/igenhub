@@ -35,6 +35,7 @@ urlpatterns = [
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/(?P<parent>[\w-]+)/(?P<parent_id>\d+)/comments/delete/(?P<comment_id>\d+)/$', views.delete_comment, name='delete_comment'),
     url(r'^signup/$', views.signup, name='signup'),
     url(r'^accounts/profile/$', views.editUser, name='editUser'),
+    url(r'^accounts/profile/removeAvatar', views.remove_avatar, name='remove_avatar'),
     url(r'^login/$', auth_views.login, name='login'),
     url(r'^logout/$', views.logout_view, name='logout'),
     url(r'^$', views.home, name='home'),

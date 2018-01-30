@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
-
+from django.core.exceptions import ObjectDoesNotExist
 import datetime
 import requests
 import simplejson as json
@@ -231,7 +231,8 @@ def close(request, owner_name, repo_name, issue_id):
     issues_list = Issue.objects.order_by('-date')
     user_list = User.objects.all()  # DOBITI SAMO AUTORE
     milestone_list = Milestone.objects.all()
-    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list,
+    images = UserImage.objects.all()
+    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list, 'images':images,
                                                           'milestones': milestone_list, 'owner_name': owner_name,
                                                           'repo_name': repo_name})
 
@@ -345,7 +346,10 @@ def selected_branch(request, owner_name, repo_name):
 
 def repositories(request, owner_name):
     repositories = Repository.objects.filter(author=request.user).all()
-    image = UserImage.objects.get(user=request.user)
+    try:
+        image = UserImage.objects.get(user=request.user)
+    except ObjectDoesNotExist:
+        image = None
     return render(request, 'igenapp/repository/repository.html',
                   {'repositories': repositories, 'image':image, 'owner_name': request.user.username})
 
@@ -424,18 +428,28 @@ def signup(request):
 def editUser(request):
     #nacin dobavljanja korisnika iz sesije je request.user
     user = request.user
-    #print("aaaa " + str(user.id))
     if request.method == "POST":
         form = UserEditForm(request.POST, instance=user)
         if form.is_valid():
             user = form.save(commit=False)
             user.save()
             context = dict()
-            image = UserImage.objects.get(user=user)
-            avat = request.FILES.get('avatar', False)
-            if avat:
-                image.avatar = request.FILES['avatar']
-                image.save()
+            try:
+                image = UserImage.objects.get(user=user)
+                avat = request.FILES.get('avatar', False)
+                if avat != False:
+                    image.user = User.objects.get(username=user.username)
+                    image.avatar = request.FILES['avatar']
+                    image.save()
+            except ObjectDoesNotExist:
+                avat = request.FILES.get('avatar', False)
+                if avat != False:
+                    image = UserImage()
+                    image.user = User.objects.get(username=user.username)
+                    image.avatar = request.FILES['avatar']
+                    image.save()
+                else:
+                    image = None
             context['image'] = image
             context['form'] = UserEditForm(instance = user)
             context['owner_name'] = user.username
@@ -444,7 +458,10 @@ def editUser(request):
             return render(request, 'igenapp/users/user_profile.html', context)
         else:
             context = dict()
-            image = UserImage.objects.get(user=user)
+            try:
+                image = UserImage.objects.get(user=user)
+            except ObjectDoesNotExist:
+                image = None
             context['image'] = image
             context['form'] = form
             context['message'] = 'Error updating profile info. Please check input data!'
@@ -456,16 +473,25 @@ def editUser(request):
             user = request.user
             context = dict()
             context['form'] = UserEditForm(instance=user)
-            image = UserImage.objects.get(user = user)
+            try:
+                image = UserImage.objects.get(user=user)
+            except ObjectDoesNotExist:
+                image = None
             context['image'] = image
             context['new_image'] = ImageForm()
             context['owner_name'] = user.username
-            #form = UserEditForm(initial = {'first_name': user.first_name, 'last_name': user.last_name, 'username': user.username, 'email': user.email})
-
             return render(request, 'igenapp/users/user_profile.html', context)
         else:
             return redirect('login')
 
+def remove_avatar(request):
+    user = request.user
+    try:
+        image = UserImage.objects.get(user=user)
+        image.delete()
+    except ObjectDoesNotExist:
+        image = None
+    return redirect('editUser')
 
 def logout_view(request):
     logout(request)
