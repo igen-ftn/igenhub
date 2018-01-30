@@ -16,6 +16,7 @@
         {% csrf_token %}
         <table>
             {{ form.as_table }}
+            <img src="{{ image.avatar.url }}"/>
             <tr>
                 <td>
                     &nbsp;
@@ -26,5 +27,4 @@
             </tr>
         </table>
     </form>
-
 {% endblock %}
