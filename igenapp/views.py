@@ -52,7 +52,8 @@ def wiki_form(request, owner_name, repo_name):
 def wiki_page(request, owner_name, repo_name, wikipage_id):
     wikipage = get_object_or_404(WikiPage, pk=wikipage_id)
     comments = Comment.objects.filter(wiki=wikipage).order_by('date')
-    return render(request, 'igenapp/wiki/page.html', {'wiki': wikipage, 'comments': comments,
+    images = UserImage.objects.all()
+    return render(request, 'igenapp/wiki/page.html', {'wiki': wikipage, 'comments': comments, 'images':images,
                                                                  'owner_name': owner_name, 'repo_name': repo_name})
 
 def remove_wikipage(request, owner_name, repo_name, wikipage_id):
@@ -211,7 +212,8 @@ def create_history(request, text, issue):
 def issue_details(request, owner_name, repo_name, issue_id):
     issue = get_object_or_404(Issue, pk=issue_id)
     comments = Comment.objects.filter(issue = issue).order_by('date')
-    return render(request, 'igenapp/issues/issue_details.html', {'issue': issue, 'comments': comments,
+    images = UserImage.objects.all()
+    return render(request, 'igenapp/issues/issue_details.html', {'issue': issue, 'comments': comments, 'images':images,
                                                                  'owner_name': owner_name, 'repo_name': repo_name})
 
 
@@ -249,7 +251,8 @@ def search(request, owner_name, repo_name):
 
     user_list = User.objects.all()  # DOBITI SAMO AUTORE
     milestone_list = Milestone.objects.all()
-    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list,
+    images = UserImage.objects.all()
+    return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list, 'images':images,
                                     'milestones': milestone_list, 'owner_name': owner_name, 'repo_name': repo_name})
 
 
@@ -342,9 +345,9 @@ def selected_branch(request, owner_name, repo_name):
 
 def repositories(request, owner_name):
     repositories = Repository.objects.filter(author=request.user).all()
-
+    image = UserImage.objects.get(user=request.user)
     return render(request, 'igenapp/repository/repository.html',
-                  {'repositories': repositories, 'owner_name': request.user.username})
+                  {'repositories': repositories, 'image':image, 'owner_name': request.user.username})
 
 
 def new_repository(request, owner_name):
@@ -428,12 +431,16 @@ def editUser(request):
             user = form.save(commit=False)
             user.save()
             context = dict()
+            image = UserImage.objects.get(user=user)
+            context['image'] = image
             context['form'] = UserEditForm(instance = user)
             context['owner_name'] = user.username
             context['message'] = 'Your profile has been successfully updated!'
             return render(request, 'igenapp/users/user_profile.html', context)
         else:
             context = dict()
+            image = UserImage.objects.get(user=user)
+            context['image'] = image
             context['form'] = form
             context['message'] = 'Error updating profile info. Please check input data!'
             context['owner_name'] = user.username
@@ -444,7 +451,6 @@ def editUser(request):
             context = dict()
             context['form'] = UserEditForm(instance=user)
             image = UserImage.objects.get(user = user)
-            print(image.user.username)
             context['image'] = image
             context['owner_name'] = user.username
             #form = UserEditForm(initial = {'first_name': user.first_name, 'last_name': user.last_name, 'username': user.username, 'email': user.email})
