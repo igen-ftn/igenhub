@@ -409,10 +409,12 @@ def signup(request):
             password = form.cleaned_data['password']
             user.set_password(password)
             user.save()
-            image = UserImage()
-            image.avatar = request.FILES['avatar']
-            image.user = User.objects.get(username=user.username)
-            image.save()
+            avat = request.FILES.get('avatar', False)
+            if avat != False:
+                image = UserImage()
+                image.avatar = request.FILES['avatar']
+                image.user = User.objects.get(username=user.username)
+                image.save()
             return redirect('login')
         else:
             context = dict()
