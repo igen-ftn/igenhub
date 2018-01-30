@@ -432,9 +432,14 @@ def editUser(request):
             user.save()
             context = dict()
             image = UserImage.objects.get(user=user)
+            avat = request.FILES.get('avatar', False)
+            if avat:
+                image.avatar = request.FILES['avatar']
+                image.save()
             context['image'] = image
             context['form'] = UserEditForm(instance = user)
             context['owner_name'] = user.username
+            context['new_image'] = ImageForm()
             context['message'] = 'Your profile has been successfully updated!'
             return render(request, 'igenapp/users/user_profile.html', context)
         else:
@@ -444,6 +449,7 @@ def editUser(request):
             context['form'] = form
             context['message'] = 'Error updating profile info. Please check input data!'
             context['owner_name'] = user.username
+            context['new_image'] = ImageForm()
             return render(request, 'igenapp/users/user_profile.html', context)
     else:
         if request.user.is_authenticated:
@@ -452,6 +458,7 @@ def editUser(request):
             context['form'] = UserEditForm(instance=user)
             image = UserImage.objects.get(user = user)
             context['image'] = image
+            context['new_image'] = ImageForm()
             context['owner_name'] = user.username
             #form = UserEditForm(initial = {'first_name': user.first_name, 'last_name': user.last_name, 'username': user.username, 'email': user.email})
 
