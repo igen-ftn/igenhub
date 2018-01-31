@@ -1,6 +1,7 @@
 # custom
 .idea
 igenapp/migrations
+igenapp/media
 
 
 # Byte-compiled / optimized / DLL files
