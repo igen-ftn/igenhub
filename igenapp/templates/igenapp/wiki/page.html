@@ -12,6 +12,7 @@
 {% endblock %}
 
 {% block body %}
+{% load igenapp_extras %}
 <div class="row">
   <div class="row">
     <div class="col-md-8">
@@ -36,11 +37,15 @@
     <div class="row">
         <div class="col-sm-1">
             <div class="thumbnail">
-                {% for image in images %}
-                    {% if image.user == user %}
-                        <img class="img-responsive user-photo" src="{{image.avatar.url}}">
-                    {% endif %}
-                {% endfor %}
+                {% if comment.user|ifinlist:images %}
+                    {% for image in images %}
+                        {% if image.user == comment.user %}
+                            <img class="img-responsive user-photo" src="{{image.avatar.url}}">
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <img src="http://bootdey.com/img/Content/user_1.jpg" class="img-responsive user-photo" alt="profile picture"/>
+                {% endif %}
             </div>
         </div>
         <div class="col-sm-5">
@@ -75,11 +80,15 @@
         <div class="row">
             <div class="col-sm-1">
                 <div class="thumbnail">
-                    {% for image in images %}
-                        {% if image.user == user %}
-                            <img class="img-responsive user-photo" src="{{image.avatar.url}}">
-                        {% endif %}
-                    {% endfor %}
+                    {% if user|ifinlist:images %}
+                        {% for image in images %}
+                            {% if image.user == user %}
+                                <img class="img-responsive user-photo" src="{{image.avatar.url}}">
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <img src="http://bootdey.com/img/Content/user_1.jpg"/>
+                    {% endif %}
                 </div>
             </div>
             <div class="col-sm-5">

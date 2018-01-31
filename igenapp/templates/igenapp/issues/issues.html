@@ -9,6 +9,7 @@
 {% endblock %}
 
 {% block body %}
+{% load igenapp_extras %}
 <h1>Issues</h1>
 <label>Repository: {{repo_name}} | Owner: {{owner_name}}</label>
 <br /><br />
@@ -84,11 +85,15 @@
         <div class="panel panel-white post panel-shadow">
             <div class="post-heading">
                 <div class="pull-left image">
-                    {% for image in images %}
-                        {% if image.user == issue.user %}
-                            <img src="{{image.avatar.url}}" class="img-circle avatar" alt="profile picture" />
-                        {% endif %}
-                    {% endfor %}
+                    {% if issue.user|ifinlist:images %}
+                        {% for image in images %}
+                            {% if image.user == issue.user %}
+                                <img src="{{image.avatar.url}}" class="img-circle avatar" alt="profile picture" />
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <img src="http://bootdey.com/img/Content/user_1.jpg" class="img-circle avatar" alt="profile picture"/>
+                    {% endif %}
                 </div>
                 <div class="pull-left meta">
                     <div class="title h5">
