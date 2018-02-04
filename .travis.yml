@@ -16,10 +16,9 @@ script:
   - docker-compose up -d
   - docker-compose run web python3 manage.py makemigrations
   - docker-compose run web python3 manage.py migrate
-  - docker-compose ps
 
 after_script:
-  - docker-compose down
+  - docker-compose ps
 
 after_failure:
   - docker-compose down
