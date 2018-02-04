@@ -346,12 +346,15 @@ def selected_branch(request, owner_name, repo_name):
 
 def repositories(request, owner_name):
     repositories = Repository.objects.filter(author=request.user).all()
+    controbute_to = Repository.objects.filter(contributors=request.user).all()
+    
     try:
         image = UserImage.objects.get(user=request.user)
     except ObjectDoesNotExist:
         image = None
     return render(request, 'igenapp/repository/repository.html',
-                  {'repositories': repositories, 'image':image, 'owner_name': request.user.username})
+                  {'repositories': repositories, 'controbute_to': controbute_to,
+                   'image': image, 'owner_name': request.user.username})
 
 
 def new_repository(request, owner_name):

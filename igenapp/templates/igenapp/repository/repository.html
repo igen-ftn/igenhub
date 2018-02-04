@@ -16,7 +16,43 @@
 </div>
 <br /><br />
 <div class="row">
+    <div class="col-sm-8">
+        <h4>My repositories</h4>
+    </div>
     {% for repository in repositories %}
+    <div class="col-sm-8">
+        <div class="panel panel-white post panel-shadow">
+            <div class="post-heading1">
+                <div class="pull-left image">
+                    {% if image.avatar %}
+                        <img src="{{image.avatar.url}}" class="img-circle avatar1" alt="user profile image">
+                    {% else %}
+                        <img src="http://bootdey.com/img/Content/user_1.jpg" class="img-circle avatar1"/>
+                    {% endif %}
+                </div>
+                <div class="pull-left meta">
+                    <div class="title mt" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;max-width: 520px;">
+                        <a href="/{{repository.owner_name}}/{{repository.repo_name}}/commits"><b>{{repository.repo_name}}</b> | owner: {{repository.owner_name}}</a>
+                    </div>
+                    {% if repository.type == "G" %}
+                        <h6 class="text-muted time">Git repository | <b>url:</b> <a href="{{repository.url}}" target="_blank">{{repository.url}}</a></h6>
+                    {% else %}
+                        <h6 class="text-muted time">Local repository</h6>
+                    {% endif %}
+                </div>
+                <div class="col-sm-2" style="float:right; width: 55px;">
+                    <a href="#" class="btn btn-danger btn-circle text-uppercase"><span class="glyphicon glyphicon-remove"></span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+<div class="row">
+    <div class="col-sm-8">
+        <h4>Repositories you contribute to</h4>
+    </div>
+    {% for repository in controbute_to %}
     <div class="col-sm-8">
         <div class="panel panel-white post panel-shadow">
             <div class="post-heading1">
