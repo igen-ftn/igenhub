@@ -17,6 +17,8 @@ script:
   - whoami
   - ip addr show
   - docker-compose ps
+  - cat /etc/*-release
+  - lsb_release -a
   #- docker-compose up -d
   #- docker-compose run web python3 manage.py makemigrations
   #- docker-compose run web python3 manage.py migrate
@@ -45,8 +47,16 @@ deploy:
   skip_cleanup: true
   run:
     - pwd
+    - ls
     - whoami
     - ip addr show
+    - cat /etc/*-release
+    - lsb_release -a
+    - docker-compose -v
+    - python --version
+    - python3 --version
+    - pip -V
+    - pip3 -V
     #- "docker-compose up -d"
     #- "docker-compose run web python3 manage.py makemigrations"
     #- "docker-compose run web python3 manage.py migrate"
