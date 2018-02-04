@@ -12,13 +12,13 @@ install:
 before_script:
   - sudo apt-get update
 
-script:
-  - docker-compose up -d
-  - docker-compose run web python3 manage.py makemigrations
-  - docker-compose run web python3 manage.py migrate
+#script:
+  #- docker-compose up -d
+  #- docker-compose run web python3 manage.py makemigrations
+  #- docker-compose run web python3 manage.py migrate
 
-after_script:
-  - docker-compose ps
+#after_script:
+  #- docker-compose ps
 
 after_failure:
   - docker-compose down
@@ -42,3 +42,10 @@ deploy:
   app: igenhub
   on: travis
   skip_cleanup: true
+  run:
+    - "docker-compose up -d"
+    - "docker-compose run web python3 manage.py makemigrations"
+    - "docker-compose run web python3 manage.py migrate"
+    - "docker-compose ps"
+
+after_deploy: "echo 'Success!'"
