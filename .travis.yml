@@ -12,7 +12,8 @@ install:
 before_script:
   - sudo apt-get update
 
-#script:
+script:
+  - docker-compose ps
   #- docker-compose up -d
   #- docker-compose run web python3 manage.py makemigrations
   #- docker-compose run web python3 manage.py migrate
