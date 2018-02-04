@@ -44,6 +44,8 @@ deploy:
     secure: $HEROKU_API_KEY
   app: igenhub
   on: travis
+  install: install
+  before_install: before_install
   skip_cleanup: true
   run:
     - pwd
