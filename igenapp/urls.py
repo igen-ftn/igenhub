@@ -1,6 +1,8 @@
 from django.conf.urls import url
 from igenapp import views
 from django.contrib.auth import views as auth_views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
                #url(r'^$', views.index, name='index'),
@@ -33,9 +35,10 @@ urlpatterns = [
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/(?P<parent>[\w-]+)/(?P<parent_id>\d+)/comments/delete/(?P<comment_id>\d+)/$', views.delete_comment, name='delete_comment'),
     url(r'^signup/$', views.signup, name='signup'),
     url(r'^accounts/profile/$', views.editUser, name='editUser'),
+    url(r'^accounts/profile/removeAvatar', views.remove_avatar, name='remove_avatar'),
     url(r'^login/$', auth_views.login, name='login'),
     url(r'^logout/$', views.logout_view, name='logout'),
     url(r'^$', views.home, name='home'),
     url(r'^(?P<owner_name>[\w-]*)/$', views.home, name='home'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/$', views.landing, name='landing')
-              ]
+              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

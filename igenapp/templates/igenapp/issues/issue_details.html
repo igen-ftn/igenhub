@@ -12,6 +12,7 @@
 {% endblock %}
 
 {% block body %}
+{% load igenapp_extras %}
 <h1>{{issue.title}}</h1>
 <br/>
 <div>
@@ -61,7 +62,15 @@
     <div class="row">
         <div class="col-sm-1">
             <div class="thumbnail">
-                <img class="img-responsive user-photo" src="https://ssl.gstatic.com/accounts/ui/avatar_2x.png">
+                {% if comment.user|ifinlist:images %}
+                    {% for image in images %}
+                        {% if image.user == comment.user %}
+                            <img class="img-responsive user-photo" src="{{ image.avatar.url }}">
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <img src="http://bootdey.com/img/Content/user_1.jpg" class="img-responsive user-photo"/>
+                {% endif %}
             </div>
         </div>
         <div class="col-sm-5">
@@ -96,7 +105,15 @@
         <div class="row">
             <div class="col-sm-1">
                 <div class="thumbnail">
-                    <img class="img-responsive user-photo" src="https://ssl.gstatic.com/accounts/ui/avatar_2x.png">
+                    {% if user|ifinlist:images %}
+                        {% for image in images %}
+                            {% if image.user == user %}
+                                <img class="img-responsive user-photo" src="{{image.avatar.url}}">
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <img src="http://bootdey.com/img/Content/user_1.jpg"/>
+                    {% endif %}
                 </div>
             </div>
             <div class="col-sm-5">

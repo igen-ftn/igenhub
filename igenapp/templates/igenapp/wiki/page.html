@@ -12,7 +12,8 @@
 {% endblock %}
 
 {% block body %}
-<div>
+{% load igenapp_extras %}
+<div class="row">
   <div class="row">
     <div class="col-md-8">
       <h2>{{wiki.title}}</h2>
@@ -25,8 +26,9 @@
       </div>
     </div>
   </div>
-
-  <p>{{wiki.content}}</p>
+    <div class="col-md-12 col-lg-11 container panel row">
+        <p class="col-md-12 col-lg-11" style="word-break: break-all">{{wiki.content}}</p>
+    </div>
 </div>
 
 <!-- comments -->
@@ -35,7 +37,15 @@
     <div class="row">
         <div class="col-sm-1">
             <div class="thumbnail">
-                <img class="img-responsive user-photo" src="https://ssl.gstatic.com/accounts/ui/avatar_2x.png">
+                {% if comment.user|ifinlist:images %}
+                    {% for image in images %}
+                        {% if image.user == comment.user %}
+                            <img class="img-responsive user-photo" src="{{image.avatar.url}}">
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <img src="http://bootdey.com/img/Content/user_1.jpg" class="img-responsive user-photo" alt="profile picture"/>
+                {% endif %}
             </div>
         </div>
         <div class="col-sm-5">
@@ -70,7 +80,15 @@
         <div class="row">
             <div class="col-sm-1">
                 <div class="thumbnail">
-                    <img class="img-responsive user-photo" src="https://ssl.gstatic.com/accounts/ui/avatar_2x.png">
+                    {% if user|ifinlist:images %}
+                        {% for image in images %}
+                            {% if image.user == user %}
+                                <img class="img-responsive user-photo" src="{{image.avatar.url}}">
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <img src="http://bootdey.com/img/Content/user_1.jpg"/>
+                    {% endif %}
                 </div>
             </div>
             <div class="col-sm-5">
