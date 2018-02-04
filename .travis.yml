@@ -43,8 +43,6 @@ deploy:
     secure: $HEROKU_API_KEY
   app: igenhub
   on: travis
-  install: install
-  before_install: before_install
   skip_cleanup: true
   run:
     - pwd
@@ -52,8 +50,8 @@ deploy:
     - whoami
     - ip addr show
     - lsb_release -a
-    - sudo curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-    - sudo chmod +x /usr/local/bin/docker-compose
+    - curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+    - chmod +x /usr/local/bin/docker-compose
     - docker-compose --version
     #- "docker-compose up -d"
     #- "docker-compose run web python3 manage.py makemigrations"
