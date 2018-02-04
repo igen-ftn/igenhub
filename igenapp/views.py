@@ -362,6 +362,12 @@ def new_repository(request, owner_name):
     return render(request, 'igenapp/repository/new_repository.html', {'users': users, 'owner_name': owner_name})
 
 
+def delete_repository(request, owner_name, repository_id):
+    Repository.objects.filter(pk=repository_id).delete()
+
+    return redirect('/' + owner_name + '/repositories')
+
+
 def add_repository(request, owner_name):
     if request.method == "POST":
         error = True

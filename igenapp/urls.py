@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'^^(?P<owner_name>[\w-]+)/repositories/$', views.repositories, name='repositories'),
     url(r'^^(?P<owner_name>[\w-]+)/new_repository/$', views.new_repository, name='new_repository'),
     url(r'^^(?P<owner_name>[\w-]+)/add_repository/$', views.add_repository, name='add_repository'),
+    url(r'^^(?P<owner_name>[\w-]+)/repository/delete/(?P<repository_id>\d+)/$', views.delete_repository, name='delete_repository'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/(?P<parent>[\w-]+)/(?P<parent_id>\d+)/comments/$', views.add_comment, name='add_comment'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/(?P<parent>[\w-]+)/(?P<parent_id>\d+)/comments/edit/$', views.edit_comment, name='edit_comment'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/(?P<parent>[\w-]+)/(?P<parent_id>\d+)/comments/delete/(?P<comment_id>\d+)/$', views.delete_comment, name='delete_comment'),

@@ -41,7 +41,7 @@
                     {% endif %}
                 </div>
                 <div class="col-sm-2" style="float:right; width: 55px;">
-                    <a href="#" class="btn btn-danger btn-circle text-uppercase"><span class="glyphicon glyphicon-remove"></span></a>
+                    <a href="/{{owner_name}}/repository/delete/{{repository.id}}" class="btn btn-danger btn-circle text-uppercase"><span class="glyphicon glyphicon-remove"></span></a>
                 </div>
             </div>
         </div>
@@ -72,9 +72,6 @@
                     {% else %}
                         <h6 class="text-muted time">Local repository</h6>
                     {% endif %}
-                </div>
-                <div class="col-sm-2" style="float:right; width: 55px;">
-                    <a href="#" class="btn btn-danger btn-circle text-uppercase"><span class="glyphicon glyphicon-remove"></span></a>
                 </div>
             </div>
         </div>
