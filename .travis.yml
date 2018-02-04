@@ -1,0 +1,35 @@
+sudo: required
+language: python
+python:
+  - "2.7"
+  - "3.5"
+
+services: docker
+# command to install dependencies
+install:
+  - pip install -r requirements.txt
+
+before_script:
+  - sudo apt-get update
+
+script:
+  - docker-compose up -d
+  - docker-compose run web python3 manage.py makemigrations
+  - docker-compose run web python3 manage.py migrate
+  - docker-compose ps
+
+after_script:
+  - docker-compose down
+
+after_failure:
+  - docker-compose down
+
+env:
+  - DOCKER_COMPOSE_VERSION = 1.4.2
+
+before_install:
+  - docker --version
+
+branches:
+  only:
+  - travis
