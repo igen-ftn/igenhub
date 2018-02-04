@@ -9,17 +9,17 @@ services: docker
 install:
   - pip install -r requirements.txt
 
-before_script:
+before_install:
   - sudo apt-get update
 
 script:
+  - pwd
+  - whoami
+  - ip addr show
   - docker-compose ps
   #- docker-compose up -d
   #- docker-compose run web python3 manage.py makemigrations
   #- docker-compose run web python3 manage.py migrate
-
-#after_script:
-  #- docker-compose ps
 
 after_failure:
   - docker-compose down
@@ -44,9 +44,12 @@ deploy:
   on: travis
   skip_cleanup: true
   run:
-    - "docker-compose up -d"
-    - "docker-compose run web python3 manage.py makemigrations"
-    - "docker-compose run web python3 manage.py migrate"
-    - "docker-compose ps"
+    - pwd
+    - whoami
+    - ip addr show
+    #- "docker-compose up -d"
+    #- "docker-compose run web python3 manage.py makemigrations"
+    #- "docker-compose run web python3 manage.py migrate"
+    #- "docker-compose ps"
 
 after_deploy: "echo 'Success!'"
