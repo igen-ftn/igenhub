@@ -17,7 +17,6 @@ script:
   - whoami
   - ip addr show
   - docker-compose ps
-  - cat /etc/*-release
   - lsb_release -a
   #- docker-compose up -d
   #- docker-compose run web python3 manage.py makemigrations
@@ -52,13 +51,10 @@ deploy:
     - ls
     - whoami
     - ip addr show
-    - cat /etc/*-release
     - lsb_release -a
-    - docker-compose -v
-    - python --version
-    - python3 --version
-    - pip -V
-    - pip3 -V
+    - sudo curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+    - sudo chmod +x /usr/local/bin/docker-compose
+    - docker-compose --version
     #- "docker-compose up -d"
     #- "docker-compose run web python3 manage.py makemigrations"
     #- "docker-compose run web python3 manage.py migrate"
