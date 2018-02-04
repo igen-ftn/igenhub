@@ -4,3 +4,6 @@ requests==2.18.4
 simplejson==3.13.2
 Pillow
 django-cleanup
+dj-database-url
+gunicorn
+whitenoise
