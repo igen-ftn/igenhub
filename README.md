@@ -28,7 +28,7 @@ docker-compose run web python3 manage.py migrate
 ```
 Note: if these commands do not work, try using `sudo` in front of them  
 
-After starting the application in your browser go to:
+After starting the application, in your browser go to:
 ```
 http://localhost:8000
 ```
