@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
-import datetime
+from django.utils import timezone
 import requests
 import simplejson as json
 
@@ -124,7 +124,7 @@ def add_issue(request, owner_name, repo_name, issue_id):
                     issue.save()
             else:
                 issue = Issue(title=form.cleaned_data['title'], text=form.cleaned_data['text'], ordinal=1,
-                              date=datetime.datetime.now(), status='O', user=request.user)
+                              date=timezone.now(), status='O', user=request.user)
                 issue.save()
             if form.cleaned_data['milestone'] != 'null':
                 milestone = get_object_or_404(Milestone, pk=form.cleaned_data['milestone'])
@@ -204,7 +204,7 @@ def issue_history(request, form, issue_id):
 
 
 def create_history(request, text, issue):
-    new_history = IssueHistory.objects.create(user=request.user, text=text, date=datetime.datetime.now())
+    new_history = IssueHistory.objects.create(user=request.user, text=text, date=timezone.now())
     issue.history.add(new_history)
     issue.save()
 
@@ -271,7 +271,7 @@ def add_milestone(request, owner_name, repo_name):
             if due_date == '':
                 due_date = None
             Milestone.objects.create(title=form.cleaned_data['title'], description=form.cleaned_data['description'],
-                                     creation_date=datetime.datetime.now(), due_date=due_date, status='O')
+                                     creation_date=timezone.now(), due_date=due_date, status='O')
     else:
         form = MilestoneForm()
 
@@ -515,7 +515,7 @@ def add_comment(request, owner_name, repo_name, parent, parent_id):
             comment = Comment()
             comment.content = request.POST['content']
             comment.user = request.user
-            comment.date = datetime.datetime.now()
+            comment.date = timezone.now()
             comment.issue = Issue.objects.get(id=parent_id)
             comment.save()
             return redirect('issue_details', owner_name, repo_name, parent_id)
@@ -523,7 +523,7 @@ def add_comment(request, owner_name, repo_name, parent, parent_id):
             comment = Comment()
             comment.content = request.POST['content']
             comment.user = request.user
-            comment.date = datetime.datetime.now()
+            comment.date = timezone.now()
             comment.wiki = WikiPage.objects.get(id=parent_id)
             comment.save()
             return redirect('wiki-page', owner_name, repo_name, parent_id)
