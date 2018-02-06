@@ -38,6 +38,7 @@ class Label(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=20)
     color = models.CharField(max_length=7)
+    repository = models.ForeignKey(Repository)
 
 
 class Milestone(models.Model):
@@ -51,6 +52,7 @@ class Milestone(models.Model):
         ('C', 'Closed'),
     )
     status = models.CharField(max_length=1, choices=STATUS_CHOICE, default='O')
+    repository = models.ForeignKey(Repository)
 
 
 class IssueHistory(models.Model):
@@ -76,6 +78,7 @@ class Issue(models.Model):
     assignee = models.ManyToManyField(User, related_name='issue_assignees')
     label = models.ManyToManyField(Label)
     milestone = models.ForeignKey(Milestone, default=None, blank=True, null=True)
+    repository = models.ForeignKey(Repository)
 
 
 class WikiPage(models.Model):
