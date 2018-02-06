@@ -32,6 +32,7 @@ script:
 
 after_script:
   - docker-compose down
+  - export SSHPASS=$DO_PASS
 
 after_failure:
   - docker-compose down
