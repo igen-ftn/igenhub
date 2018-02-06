@@ -85,18 +85,20 @@ def edit_wikipage(request, owner_name, repo_name, wikipage_id):
 
 
 def issues(request, owner_name, repo_name):
-    issues_list = Issue.objects.order_by('-date')
+    repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
+    issues_list = Issue.objects.filter(repository=repository).order_by('-date')
     user_list = User.objects.all() #DOBITI SAMO AUTORE
     images = UserImage.objects.all()
-    milestone_list = Milestone.objects.all()
+    milestone_list = Milestone.objects.filter(repository=repository)
     return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list, 'milestones': milestone_list, 'images':images,
                                                           'owner_name': owner_name, 'repo_name': repo_name })
 
 
 def new_issue(request, owner_name, repo_name, issue_id):
-    milestone_list = Milestone.objects.all()
-    label_list = Label.objects.all()
-    users = User.objects.all()
+    repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
+    milestone_list = Milestone.objects.filter(repository=repository)
+    label_list = Label.objects.filter(repository=repository)
+    users = User.objects.all() #DOBITI SAMO AUTORE
     images = UserImage.objects.all()
     try:
         issue = Issue.objects.get(pk=issue_id)
@@ -123,8 +125,9 @@ def add_issue(request, owner_name, repo_name, issue_id):
                     issue.milestone = None
                     issue.save()
             else:
+                repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
                 issue = Issue(title=form.cleaned_data['title'], text=form.cleaned_data['text'], ordinal=1,
-                              date=timezone.now(), status='O', user=request.user)
+                              date=timezone.now(), status='O', user=request.user, repository=repository)
                 issue.save()
             if form.cleaned_data['milestone'] != 'null':
                 milestone = get_object_or_404(Milestone, pk=form.cleaned_data['milestone'])
@@ -136,9 +139,10 @@ def add_issue(request, owner_name, repo_name, issue_id):
     else:
         form = IssueForm()
 
-    issues_list = Issue.objects.order_by('-date')
+    repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
+    issues_list = Issue.objects.filter(repository=repository).order_by('-date')
     user_list = User.objects.all()  # DOBITI SAMO AUTORE
-    milestone_list = Milestone.objects.all()
+    milestone_list = Milestone.objects.filter(repository=repository)
     images = UserImage.objects.all()
     return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list, 'images':images,
                                                           'milestones': milestone_list, 'owner_name': owner_name,
@@ -228,9 +232,10 @@ def close(request, owner_name, repo_name, issue_id):
         create_history(request, ' reopened issue ', issue)
     issue.save()
 
-    issues_list = Issue.objects.order_by('-date')
+    repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
+    issues_list = Issue.objects.filter(repository=repository).order_by('-date')
     user_list = User.objects.all()  # DOBITI SAMO AUTORE
-    milestone_list = Milestone.objects.all()
+    milestone_list = Milestone.objects.filter(repository=repository)
     images = UserImage.objects.all()
     return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list, 'images':images,
                                                           'milestones': milestone_list, 'owner_name': owner_name,
@@ -242,7 +247,8 @@ def search(request, owner_name, repo_name):
     milestone = request.POST.get('milestone')
     status = request.POST.get('status')
 
-    issues_list = Issue.objects.order_by('-date')
+    repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
+    issues_list = Issue.objects.filter(repository=repository).order_by('-date')
     if author != 'null':
         issues_list = issues_list.filter(user=author)
     if milestone != 'null':
@@ -251,14 +257,15 @@ def search(request, owner_name, repo_name):
         issues_list = issues_list.filter(status=status)
 
     user_list = User.objects.all()  # DOBITI SAMO AUTORE
-    milestone_list = Milestone.objects.all()
+    milestone_list = Milestone.objects.filter(repository=repository)
     images = UserImage.objects.all()
     return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list, 'images':images,
                                     'milestones': milestone_list, 'owner_name': owner_name, 'repo_name': repo_name})
 
 
 def milestones(request, owner_name, repo_name):
-    milestone_list = Milestone.objects.all()
+    repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
+    milestone_list = Milestone.objects.filter(repository=repository)
     return render(request, 'igenapp/milestones/milestones.html',
                   {'milestones': milestone_list, 'owner_name': owner_name, 'repo_name': repo_name})
 
@@ -268,27 +275,32 @@ def add_milestone(request, owner_name, repo_name):
         form = MilestoneForm(request.POST)
         if form.is_valid():
             due_date = request.POST.get('due_date')
+            repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
             if due_date == '':
                 due_date = None
             Milestone.objects.create(title=form.cleaned_data['title'], description=form.cleaned_data['description'],
-                                     creation_date=timezone.now(), due_date=due_date, status='O')
+                                     creation_date=timezone.now(), due_date=due_date, status='O',
+                                     repository=repository)
     else:
         form = MilestoneForm()
 
-    milestone_list = Milestone.objects.all()
+    repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
+    milestone_list = Milestone.objects.filter(repository=repository)
     return render(request, 'igenapp/milestones/milestones.html',
                   {'milestones': milestone_list, 'owner_name': owner_name, 'repo_name': repo_name})
 
 
 def remove_milestone(request, owner_name, repo_name, milestone_id):
     Milestone.objects.filter(pk=milestone_id).delete()
-    milestone_list = Milestone.objects.all()
+    repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
+    milestone_list = Milestone.objects.filter(repository=repository)
     return render(request, 'igenapp/milestones/milestones.html',
                   {'milestones': milestone_list, 'owner_name': owner_name, 'repo_name': repo_name})
 
 
 def labels(request, owner_name, repo_name):
-    label_list = Label.objects.all()
+    repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
+    label_list = Label.objects.filter(repository=repository)
     return render(request, 'igenapp/labels/labels.html', {'labels': label_list, 'owner_name': owner_name, 'repo_name': repo_name})
 
 
@@ -296,17 +308,20 @@ def add_label(request, owner_name, repo_name):
     if request.method == "POST":
         form = LabelForm(request.POST)
         if form.is_valid():
-            Label.objects.create(name=form.cleaned_data['name'], color=form.cleaned_data['color'])
+            repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
+            Label.objects.create(name=form.cleaned_data['name'], color=form.cleaned_data['color'], repository=repository)
     else:
         form = LabelForm()
 
-    label_list = Label.objects.all()
+    repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
+    label_list = Label.objects.filter(repository=repository)
     return render(request, 'igenapp/labels/labels.html', {'labels': label_list, 'owner_name': owner_name, 'repo_name': repo_name})
 
 
 def remove_label(request, owner_name, repo_name, label_id):
     Label.objects.filter(pk=label_id).delete()
-    label_list = Label.objects.all()
+    repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
+    label_list = Label.objects.filter(repository=repository)
     return render(request, 'igenapp/labels/labels.html', {'labels': label_list, 'owner_name': owner_name, 'repo_name': repo_name})
 
 
