@@ -20,6 +20,7 @@ before_install:
   - ls
   - sudo apt-get update
   - sudo apt-get install sshpass
+  - sshpass -V
 
 script:
   - whoami
@@ -42,9 +43,9 @@ branches:
   only:
   - do
 
-#deploy:
-#  provider: script
-#  skip_cleanup: true
-#  script: sshpass -p '$DO_PASS' ssh $HOST@$HOST_IP
-#  on:
-#    branch: do
+deploy:
+  provider: script
+  skip_cleanup: true
+  script: sshpass -p '$DO_PASS' ssh $HOST@$HOST_IP
+  on:
+    branch: do
