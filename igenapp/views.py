@@ -420,8 +420,8 @@ def add_repository(request, owner_name):
             form = LocalRepositoryForm(request.POST)
             if form.is_valid():
                 repo_name = re.sub('[\s+]', '_', form.cleaned_data['repo_name'].strip())
-                old_repo = Repository.objects.get(repo_name=repo_name, owner_name=request.user.username)
-                if old_repo is None:
+                old_repo = Repository.objects.filter(repo_name=repo_name, owner_name=request.user.username)
+                if len(old_repo) == 0:
                     repository = Repository(author=request.user,
                                             repo_name=repo_name,
                                             owner_name=request.user.username, type='L')
@@ -441,7 +441,7 @@ def add_repository(request, owner_name):
                 owner_repo_name = repo_url[repo_url.rfind("/", 0, repo_url.rfind("/"))+1:repo_url.rfind("/")]
                 repo_name = repo_url[repo_url.rfind("/")+1:-4]
                 old_repo = Repository.objects.filter(repo_name=repo_name, owner_name=owner_repo_name)
-                if old_repo is None:
+                if len(old_repo) == 0:
                     repository = Repository(author=request.user, repo_name=repo_name,
                                             owner_name=owner_repo_name, type='G', url=repo_url)
                     repository.save()
