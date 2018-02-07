@@ -4,7 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 import requests
 import simplejson as json
-
+import re
 from .models import *
 from .forms import *
 
@@ -415,7 +415,8 @@ def add_repository(request, owner_name):
         if repo_type == "local":
             form = LocalRepositoryForm(request.POST)
             if form.is_valid():
-                repository = Repository(author=request.user, repo_name=form.cleaned_data['repo_name'],
+                repository = Repository(author=request.user,
+                                        repo_name=re.sub('[\s+]', '_', form.cleaned_data['repo_name'].strip()),
                                         owner_name=request.user.username, type='L')
                 repository.save()
                 contributors = request.POST.getlist('contributors')
