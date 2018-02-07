@@ -35,6 +35,7 @@ after_script:
 
 after_success:
   - export SSHPASS=$DO_PASS
+  - sshpass -e ssh $HOST@$HOST_IP './deploy.sh'
 
 after_failure:
   - docker-compose down
@@ -46,9 +47,9 @@ branches:
   only:
   - do
 
-deploy:
-  provider: script
-  skip_cleanup: true
-  script: sshpass -e ssh $HOST@$HOST_IP './deploy.sh'
-  on:
-    branch: do
+#deploy:
+#  provider: script
+#  skip_cleanup: true
+#  script: sshpass -e ssh $HOST@$HOST_IP './deploy.sh'
+#  on:
+#    branch: do
