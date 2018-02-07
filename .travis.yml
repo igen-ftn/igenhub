@@ -47,6 +47,6 @@ branches:
 deploy:
   provider: script
   skip_cleanup: true
-  script: sshpass -p '$DO_PASS' ssh $HOST@$HOST_IP
+  script: sshpass -e ssh $HOST@$HOST_IP
   on:
     branch: do
