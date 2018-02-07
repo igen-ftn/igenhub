@@ -36,6 +36,7 @@ after_script:
 after_success:
   - export SSHPASS=$DO_PASS
   - sshpass -e ssh $HOST@$HOST_IP './deploy.sh'
+  - ls
 
 after_failure:
   - docker-compose down
