@@ -15,6 +15,7 @@
     </div>
 </div>
 <br /><br />
+{% if repositories %}
 <div class="row">
     <div class="col-sm-8">
         <h4>My repositories</h4>
@@ -48,6 +49,8 @@
     </div>
     {% endfor %}
 </div>
+{% endif %}
+{% if controbute_to %}
 <div class="row">
     <div class="col-sm-8">
         <h4>Repositories you contribute to</h4>
@@ -78,4 +81,17 @@
     </div>
     {% endfor %}
 </div>
+{% endif %}
+{% if activity %}
+<div class="row">
+    <div class="col-sm-8">
+        <h4>Activity:</h4>
+        {% for act in activity %}
+            <p style="width:90%"><span class="glyphicon glyphicon-user"></span> <b>{{act.user}}</b> <i><a href="{{act.link}}">{{act.text}} </a></i> in <b>{{act.repository.repo_name}}</b>
+            &nbsp;&nbsp;<span style="float:right">&nbsp;{{act.date}}</span><span style="float:right" class="glyphicon glyphicon-calendar"></span>
+            </p>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
 {% endblock %}

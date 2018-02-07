@@ -81,6 +81,15 @@ class Issue(models.Model):
     repository = models.ForeignKey(Repository)
 
 
+class Activity(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User)
+    text = models.CharField(max_length=50)
+    date = models.DateTimeField()
+    link = models.CharField(max_length=100)
+    repository = models.ForeignKey(Repository)
+
+
 class WikiPage(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=100)

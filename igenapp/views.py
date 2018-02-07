@@ -18,6 +18,12 @@ def index(request):
     return render(request, 'igenapp/index.html')
 
 
+def create_activity(request, owner_name, repo_name, text, link):
+    #Activity.objects.all().delete()
+    repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
+    Activity.objects.create(user=request.user, text=text, date=timezone.now(), link=link, repository=repository)
+
+
 def home(request, owner_name=''):
     if owner_name:
         return render(request, 'igenapp/home.html', {'owner_name': owner_name})
@@ -36,6 +42,7 @@ def wiki_form(request, owner_name, repo_name):
         form = WikiForm(request.POST)
         if form.is_valid():
             form.save()
+            create_activity(request, owner_name, repo_name, ' created wiki page ', '/'+owner_name+'/'+repo_name+'/wiki')
             return redirect('wiki', owner_name, repo_name)
         else:
             context = dict()
@@ -56,11 +63,14 @@ def wiki_page(request, owner_name, repo_name, wikipage_id):
     return render(request, 'igenapp/wiki/page.html', {'wiki': wikipage, 'comments': comments, 'images':images,
                                                                  'owner_name': owner_name, 'repo_name': repo_name})
 
+
 def remove_wikipage(request, owner_name, repo_name, wikipage_id):
     WikiPage.objects.filter(pk=wikipage_id).delete()
+    create_activity(request, owner_name, repo_name, ' removed wiki page ', '/' + owner_name + '/' + repo_name + '/wiki')
     wikipage_list = WikiPage.objects.all()
     #return render(request, 'igenapp/wiki.html', {'wikipages': wikipages_list, 'owner_name': owner_name, 'repo_name': repo_name})
     return redirect('wiki', owner_name, repo_name)
+
 
 def edit_wikipage(request, owner_name, repo_name, wikipage_id):
     if request.method == "POST":
@@ -129,6 +139,8 @@ def add_issue(request, owner_name, repo_name, issue_id):
                 issue = Issue(title=form.cleaned_data['title'], text=form.cleaned_data['text'], ordinal=1,
                               date=timezone.now(), status='O', user=request.user, repository=repository)
                 issue.save()
+                create_activity(request, owner_name, repo_name, ' created issue ' + issue.title,
+                                '/' + owner_name + '/' + repo_name + '/issues')
             if form.cleaned_data['milestone'] != 'null':
                 milestone = get_object_or_404(Milestone, pk=form.cleaned_data['milestone'])
                 issue.milestone = milestone
@@ -226,9 +238,13 @@ def close(request, owner_name, repo_name, issue_id):
 
     if issue.status == 'O':
         issue.status = 'C'
+        create_activity(request, owner_name, repo_name, ' closed issue ' + issue.title,
+                        '/' + owner_name + '/' + repo_name + '/issues')
         create_history(request, ' closed issue ', issue)
     else:
         issue.status = 'O'
+        create_activity(request, owner_name, repo_name, ' reopened issue ' + issue.title,
+                        '/' + owner_name + '/' + repo_name + '/issues')
         create_history(request, ' reopened issue ', issue)
     issue.save()
 
@@ -281,6 +297,8 @@ def add_milestone(request, owner_name, repo_name):
             Milestone.objects.create(title=form.cleaned_data['title'], description=form.cleaned_data['description'],
                                      creation_date=timezone.now(), due_date=due_date, status='O',
                                      repository=repository)
+            create_activity(request, owner_name, repo_name, ' created milestone ' + form.cleaned_data['title'],
+                            '/' + owner_name + '/' + repo_name + '/milestones')
     else:
         form = MilestoneForm()
 
@@ -291,9 +309,11 @@ def add_milestone(request, owner_name, repo_name):
 
 
 def remove_milestone(request, owner_name, repo_name, milestone_id):
-    Milestone.objects.filter(pk=milestone_id).delete()
+    m = Milestone.objects.filter(pk=milestone_id).delete()
     repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
     milestone_list = Milestone.objects.filter(repository=repository)
+    create_activity(request, owner_name, repo_name, ' removed milestone ',
+                    '/' + owner_name + '/' + repo_name + '/milestones')
     return render(request, 'igenapp/milestones/milestones.html',
                   {'milestones': milestone_list, 'owner_name': owner_name, 'repo_name': repo_name})
 
@@ -310,6 +330,8 @@ def add_label(request, owner_name, repo_name):
         if form.is_valid():
             repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
             Label.objects.create(name=form.cleaned_data['name'], color=form.cleaned_data['color'], repository=repository)
+            create_activity(request, owner_name, repo_name, ' created label ' + form.cleaned_data['name'],
+                            '/' + owner_name + '/' + repo_name + '/labels')
     else:
         form = LabelForm()
 
@@ -320,6 +342,7 @@ def add_label(request, owner_name, repo_name):
 
 def remove_label(request, owner_name, repo_name, label_id):
     Label.objects.filter(pk=label_id).delete()
+    create_activity(request, owner_name, repo_name, ' removed label ', '/' + owner_name + '/' + repo_name + '/labels')
     repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
     label_list = Label.objects.filter(repository=repository)
     return render(request, 'igenapp/labels/labels.html', {'labels': label_list, 'owner_name': owner_name, 'repo_name': repo_name})
@@ -362,14 +385,16 @@ def selected_branch(request, owner_name, repo_name):
 def repositories(request, owner_name):
     repositories = Repository.objects.filter(author=request.user).all()
     controbute_to = Repository.objects.filter(contributors=request.user).all()
-    
+    all_repos = repositories | controbute_to
+    activity = Activity.objects.filter(repository__in=all_repos).order_by('-date')
+
     try:
         image = UserImage.objects.get(user=request.user)
     except ObjectDoesNotExist:
         image = None
     return render(request, 'igenapp/repository/repository.html',
                   {'repositories': repositories, 'controbute_to': controbute_to,
-                   'image': image, 'owner_name': request.user.username})
+                   'image': image, 'activity': activity, 'owner_name': request.user.username})
 
 
 def new_repository(request, owner_name):
@@ -416,7 +441,6 @@ def add_repository(request, owner_name):
                     repository.contributors.add(contributor)
                 repository.save()
                 error = False
-
         if error:
             return redirect('/' + owner_name + '/new_repository')
 
@@ -533,6 +557,8 @@ def add_comment(request, owner_name, repo_name, parent, parent_id):
             comment.date = timezone.now()
             comment.issue = Issue.objects.get(id=parent_id)
             comment.save()
+            create_activity(request, owner_name, repo_name, ' left comment on issue ' + comment.issue.title,
+                            '/' + owner_name + '/' + repo_name + '/issues/' + str(comment.issue.id))
             return redirect('issue_details', owner_name, repo_name, parent_id)
         else:
             comment = Comment()
@@ -541,6 +567,8 @@ def add_comment(request, owner_name, repo_name, parent, parent_id):
             comment.date = timezone.now()
             comment.wiki = WikiPage.objects.get(id=parent_id)
             comment.save()
+            create_activity(request, owner_name, repo_name, ' left comment on wiki ' + comment.wiki.title,
+                            '/' + owner_name + '/' + repo_name + '/wiki-page/' + str(comment.wiki.id))
             return redirect('wiki-page', owner_name, repo_name, parent_id)
 
 
