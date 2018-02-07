@@ -4,10 +4,10 @@ python:
   #- "2.7"
   - "3.5"
 
-#addons:
-#  apt:
-#    packages:
-#      -sshpass
+addons:
+  apt:
+    packages:
+      -sshpass
 
 services: docker
 # command to install dependencies
@@ -19,7 +19,7 @@ before_install:
   - whoami
   - ls
   - sudo apt-get update
-  - sudo apt-get install sshpass
+  #- sudo apt-get install sshpass
   - sshpass -V
 
 script:
