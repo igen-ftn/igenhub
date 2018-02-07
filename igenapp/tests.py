@@ -43,3 +43,37 @@ class IssueTests(TestCase):
         form = IssueForm(data=data)
         self.assertFalse(form.is_valid())
 
+
+class RepositoryTests(TestCase):
+
+    """Preparing data"""
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.user = User.objects.create(username="user", password="user", email="user@gmail.com")
+        self.contributor = User.objects.create(username="contributor", password="contributor", email="contributor@gmail.com")
+        self.repository = Repository.objects.create(author=self.user, repo_name="repo",
+                                                    owner_name=self.user.username, type='L')
+
+    """Creating new issue test"""
+    def test_create_repository(self):
+        self.assertTrue(isinstance(self.repository, Repository))
+        self.assertEqual(self.repository.repo_name, "repo")
+        self.assertEqual(self.repository.owner_name, "user")
+        self.assertEqual(self.repository.type, "L")
+        self.assertNotEqual(self.repository.url, 'https://github.com/igen-ftn/igenhub.git')
+
+    """Repository form tests"""
+    def test_repostories_form(self):
+        data_local = {'repo_name': "Some repo name Some repo name Some repo name Some repo name Some repo name"}
+        form = LocalRepositoryForm(data=data_local)
+        self.assertFalse(form.is_valid())
+
+        data_git = {'repo_url': 'https://github.com/igen-ftn/igenhub.git'}
+        form = GitRepositoryForm(data=data_git)
+        self.assertTrue(form.is_valid())
+
+    """Adding new contributor"""
+    def test_add_controbutors(self):
+        self.repository.contributors.add(self.contributor)
+        self.repository.save()
+        self.assertEqual(len(self.repository.contributors.all()), 1)
