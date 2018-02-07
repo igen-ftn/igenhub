@@ -32,7 +32,10 @@ After starting the application in your browser go to:
 ```
 http://localhost:8000
 ```
-
+## Running tests
+```
+docker-compose run web python3 manage.py test
+```
 ## License
 
 * MIT
