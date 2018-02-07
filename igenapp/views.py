@@ -415,16 +415,19 @@ def add_repository(request, owner_name):
         if repo_type == "local":
             form = LocalRepositoryForm(request.POST)
             if form.is_valid():
-                repository = Repository(author=request.user,
-                                        repo_name=re.sub('[\s+]', '_', form.cleaned_data['repo_name'].strip()),
-                                        owner_name=request.user.username, type='L')
-                repository.save()
-                contributors = request.POST.getlist('contributors')
-                repository.contributors.clear()
-                for contributor in contributors:
-                    repository.contributors.add(contributor)
-                repository.save()
-                error = False
+                repo_name = re.sub('[\s+]', '_', form.cleaned_data['repo_name'].strip())
+                old_repo = Repository.objects.get(repo_name=repo_name, owner_name=request.user.username)
+                if old_repo is None:
+                    repository = Repository(author=request.user,
+                                            repo_name=repo_name,
+                                            owner_name=request.user.username, type='L')
+                    repository.save()
+                    contributors = request.POST.getlist('contributors')
+                    repository.contributors.clear()
+                    for contributor in contributors:
+                        repository.contributors.add(contributor)
+                    repository.save()
+                    error = False
         elif repo_type == "git":
             form = GitRepositoryForm(request.POST)
             if form.is_valid():
@@ -433,15 +436,17 @@ def add_repository(request, owner_name):
                     return redirect('/' + owner_name + '/new_repository')
                 owner_repo_name = repo_url[repo_url.rfind("/", 0, repo_url.rfind("/"))+1:repo_url.rfind("/")]
                 repo_name = repo_url[repo_url.rfind("/")+1:-4]
-                repository = Repository(author=request.user, repo_name=repo_name,
-                                        owner_name=owner_repo_name, type='G', url=repo_url)
-                repository.save()
-                contributors = request.POST.getlist('contributors')
-                repository.contributors.clear()
-                for contributor in contributors:
-                    repository.contributors.add(contributor)
-                repository.save()
-                error = False
+                old_repo = Repository.objects.filter(repo_name=repo_name, owner_name=owner_repo_name)
+                if old_repo is None:
+                    repository = Repository(author=request.user, repo_name=repo_name,
+                                            owner_name=owner_repo_name, type='G', url=repo_url)
+                    repository.save()
+                    contributors = request.POST.getlist('contributors')
+                    repository.contributors.clear()
+                    for contributor in contributors:
+                        repository.contributors.add(contributor)
+                    repository.save()
+                    error = False
         if error:
             return redirect('/' + owner_name + '/new_repository')
 
