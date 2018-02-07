@@ -18,7 +18,7 @@ before_install:
   - docker --version
   - whoami
   - ls
-  - sudo apt-get update
+  #- sudo apt-get update
   #- sudo apt-get install sshpass
   - sshpass -V
 
