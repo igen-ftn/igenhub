@@ -356,10 +356,14 @@ def commits(request, owner_name, repo_name):
     result = requests.get('https://api.github.com/repos/%s/%s/commits' % (owner_name, repo_name))
     commits = json.loads(result.content)
 
-    result = requests.get('https://api.github.com/repos/%s/%s/branches' % (owner_name, repo_name))
-    branches = json.loads(result.content)
+    try:
+        if commits['message'] == 'Not Found':
+            repo_info = RepositoryInfo(owner_name, repo_name, [], [])
+    except:
+        result = requests.get('https://api.github.com/repos/%s/%s/branches' % (owner_name, repo_name))
+        branches = json.loads(result.content)
 
-    repo_info = RepositoryInfo(owner_name, repo_name, branches, commits)
+        repo_info = RepositoryInfo(owner_name, repo_name, branches, commits)
 
     return render(request, 'igenapp/commits/commits.html', {'repo_info': repo_info})
 
