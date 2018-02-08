@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block navbar %}
+<li><a href="{% url 'home' owner_name %}">Home</a></li>
+<li><a href="/{{owner_name}}/repositories">Repositories</a></li>
+{% endblock %}
+{% block body %}
+{% load igenapp_extras %}
+<div class="row">
+  <div class="col-md-7 ">
+     <div class="panel panel-default">
+        <div class="panel-heading">
+           <h4 >{{user_profile.first_name}} {{user_profile.last_name}}'s Profile</h4>
+        </div>
+        <div class="panel-body">
+           <div class="box box-info">
+              <div class="box-body">
+                 <div class="col-sm-6">
+                    <div  align="center">
+                        {% if user_profile|ifinlist:images %}
+                            {% for image in images %}
+                                {% if image.user == user_profile %}
+                                    <img alt="User Pic" src="{{image.avatar.url}}" id="profile-image1" class="img-circle img-responsive">
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <img src="http://bootdey.com/img/Content/user_1.jpg" id="profile-image1"  class="img-circle img-responsive" alt="profile picture"/>
+                        {% endif %}
+                    </div>
+                    <br>
+                    <!-- /input-group -->
+                 </div>
+                 <div class="col-sm-6">
+                     <span>
+                       <h3>{{user_profile.username}}</h3>
+                    </span>
+                    <a href="#" class="btn btn-success btn-circle text-uppercase">
+                        <span class="glyphicon glyphicon-share-alt"></span> Follow
+                    </a>
+                 </div>
+                 <div class="clearfix"></div>
+                 <hr style="margin:5px 0 5px 0;">
+                 <div class="col-sm-5 col-xs-6 tital " >First Name:</div>
+                 <div class="col-sm-7 col-xs-6 ">{{user_profile.first_name}}</div>
+                 <div class="clearfix"></div>
+                 <div class="bot-border"></div>
+                 <div class="col-sm-5 col-xs-6 tital " >Last Name:</div>
+                 <div class="col-sm-7"> {{user_profile.last_name}}</div>
+                 <div class="clearfix"></div>
+                 <div class="bot-border"></div>
+                 <div class="col-sm-5 col-xs-6 tital " >Email:</div>
+                 <div class="col-sm-7">{{user_profile.email}}</div>
+                 <div class="clearfix"></div>
+                 <div class="bot-border"></div>
+                 <div class="col-sm-5 col-xs-6 tital " >Username:</div>
+                 <div class="col-sm-7">{{user_profile.username}}</div>
+                 <div class="clearfix"></div>
+                 <!-- /.box-body -->
+              </div>
+              <!-- /.box -->
+           </div>
+        </div>
+     </div>
+      <br/>
+      <h3>Repositories:</h3>
+
+      {% if repositories %}
+            {% for repository in repositories %}
+            <div class="col-sm-16">
+                <div class="panel panel-white post panel-shadow">
+                    <div class="post-heading1">
+                        <div class="pull-left image">
+                            {% if image.avatar %}
+                                <img src="{{image.avatar.url}}" class="img-circle avatar1" alt="user profile image">
+                            {% else %}
+                                <img src="http://bootdey.com/img/Content/user_1.jpg" class="img-circle avatar1"/>
+                            {% endif %}
+                        </div>
+                        <div class="pull-left meta">
+                            <div class="title mt" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;max-width: 520px;">
+                                <a href="/{{repository.owner_name}}/{{repository.repo_name}}/commits"><b>{{repository.repo_name}}</b> | owner: {{repository.owner_name}}</a>
+                            </div>
+                            {% if repository.type == "G" %}
+                                <h6 class="text-muted time">Git repository | <b>url:</b> <a href="{{repository.url}}" target="_blank">{{repository.url}}</a></h6>
+                            {% else %}
+                                <h6 class="text-muted time">Local repository</h6>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+  </div>
+</div>
+{% endblock body %}
+

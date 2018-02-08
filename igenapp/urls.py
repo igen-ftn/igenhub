@@ -41,6 +41,7 @@ urlpatterns = [
     url(r'^login/$', auth_views.login, name='login'),
     url(r'^logout/$', views.logout_view, name='logout'),
     url(r'^$', views.home, name='home'),
+    url(r'^(?P<owner_name>[\w-]+)/profilePreview/(?P<user_id>\d+)/$', views.profile_preview, name='profile_preview'),
     url(r'^(?P<owner_name>[\w-]*)/$', views.home, name='home'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/$', views.landing, name='landing')
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

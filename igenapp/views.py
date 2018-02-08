@@ -130,6 +130,18 @@ def edit_wikipage(request, owner_name, repo_name, wikipage_id):
         return render(request, 'igenapp/wiki/form.html', {'form': form, 'owner_name': owner_name, 'repo_name': repo_name})
 
 
+def profile_preview(request, owner_name, user_id):
+    user = request.user
+    user_profile = User.objects.get(pk=user_id)
+    images = UserImage.objects.all()
+    repositories = Repository.objects.filter(author=request.user).all()
+    contribute_to = Repository.objects.filter(contributors=request.user).all()
+    all_repos = repositories | contribute_to
+    return render(request, 'igenapp/profile/profilePreview.html', {'owner_name': owner_name, 'user': user,
+                                                                   'images':images, 'user_profile': user_profile,
+                                                                   'repositories': all_repos})
+
+
 def issues(request, owner_name, repo_name):
     repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
     issues_list = Issue.objects.filter(repository=repository).order_by('-date')
