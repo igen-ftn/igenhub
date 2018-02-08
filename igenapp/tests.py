@@ -12,10 +12,10 @@ class IssueTests(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.user = User.objects.create(username="user", password="user", email="user@gmail.com")
+        self.repository = Repository.objects.create(author=self.user, repo_name="repo",
+                                                    owner_name=self.user.username, type='L')
         self.issue = Issue.objects.create(title="Some Issue", text="This is first issue", ordinal=100,
-                                          date=timezone.now(), status='O', user=self.user)
-        self.repository = Repository.objects.create(author=self.issue.user, repo_name="repo",
-                                                    owner_name=self.issue.user.username, type='L')
+                                          date=timezone.now(), status='O', user=self.user, repository=self.repository)
 
     """Creating new issue test"""
     def test_create_issue(self):
@@ -43,3 +43,27 @@ class IssueTests(TestCase):
         form = IssueForm(data=data)
         self.assertFalse(form.is_valid())
 
+class CommentTests(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.user = User.objects.create_user(username="commentUser", password="comment", email="comment@gmail.com")
+        self.repository = Repository.objects.create(author=self.user, repo_name="repo1",
+                                                    owner_name=self.user.username, type='L')
+        self.issue = Issue.objects.create(title="Some Issue 1", text="This is the second issue", ordinal=101,
+                                          date=timezone.now(), status='O', user=self.user, repository=self.repository)
+        self.comment = Comment.objects.create(user=self.user, issue=self.issue, content="test test test",
+                                              date=timezone.now())
+    def test_create_comment(self):
+        self.assertTrue(isinstance(self.comment, Comment))
+        self.assertIsNotNone(self.comment.content)
+        self.assertIsNotNone(self.comment.user)
+        self.assertEqual(self.comment.user, self.user)
+        self.assertEqual(self.comment.content, "test test test")
+        self.assertEqual(self.comment.issue, self.issue)
+        self.assertIsNotNone(self.comment.date)
+
+    def test_comment_view(self):
+        request = self.factory.get('/' + self.user.username + '/' + self.repository.repo_name + '/issues' + '/' + str(self.comment.issue.id))
+        request.user = self.user
+        response = issue_details(request, self.comment.issue.repository.owner_name, self.comment.issue.repository.repo_name, self.comment.issue.id)
+        self.assertEqual(response.status_code, 200)
