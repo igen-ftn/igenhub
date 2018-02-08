@@ -39,7 +39,6 @@ def graphs(request, owner_name, repo_name):
     for i in range (6,-1,-1):
         obj = {}
         date = datetime.date.today() - datetime.timedelta(days=i)
-        print(date)
         obj["name"] = str(date)
         issueCount = 0
         for issue in issues:
@@ -54,13 +53,10 @@ def graphs(request, owner_name, repo_name):
         autori = dict()
         if result:
             for commit in commits:
-                print(commit)
                 if commit['commit']['committer']['name'] in autori.keys():
                     autori[commit['commit']['committer']['name']] = autori[commit['commit']['committer']['name']] + 1
                 else:
                     autori[commit['commit']['committer']['name']] = 0
-                    #autori.append(obj1)
-            print(autori)
             sredjenZaD3 = []
             for x in autori:
                 obj = {}

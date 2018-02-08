@@ -100,7 +100,7 @@
             height = 500 - margin.top - margin.bottom;
 
 
-            var x1 = d3.scaleBand().rangeRound([0, width])
+            var x1 = d3.scaleBand().rangeRound([0, data11.length* width/9])
             var y1 = d3.scaleLinear()
                 .range([height, 0]);
 
