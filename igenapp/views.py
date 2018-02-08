@@ -12,6 +12,8 @@ from django.template import RequestContext
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+import json
+import datetime
 
 
 def index(request):
@@ -30,6 +32,45 @@ def home(request, owner_name=''):
     else:
         return render(request, 'igenapp/home.html', {'owner_name': ''})
 
+def graphs(request, owner_name, repo_name):
+    datan = []
+    repo = Repository.objects.get(repo_name=repo_name)
+    issues = Issue.objects.filter(repository=repo.id)
+    for i in range (6,-1,-1):
+        obj = {}
+        date = datetime.date.today() - datetime.timedelta(days=i)
+        print(date)
+        obj["name"] = str(date)
+        issueCount = 0
+        for issue in issues:
+            if str(issue.date).split(" ")[0] == str(date):
+                issueCount += 1
+        obj["value"] = issueCount
+        datan.append(obj)
+    data = json.dumps(datan)
+    if repo.type == 'G':
+        result = requests.get('https://api.github.com/repos/%s/%s/commits' % (owner_name, repo_name))
+        commits = json.loads(result.content)
+        autori = dict()
+        if result:
+            for commit in commits:
+                print(commit)
+                if commit['commit']['committer']['name'] in autori.keys():
+                    autori[commit['commit']['committer']['name']] = autori[commit['commit']['committer']['name']] + 1
+                else:
+                    autori[commit['commit']['committer']['name']] = 0
+                    #autori.append(obj1)
+            print(autori)
+            sredjenZaD3 = []
+            for x in autori:
+                obj = {}
+                obj["name"] = x
+                obj["value"] = autori[x]
+                sredjenZaD3.append(obj)
+            autori = json.dumps(sredjenZaD3)
+            return render(request, 'igenapp/graphs/graphs.html',
+                          {'data': data, 'commits': autori, 'owner_name': owner_name, 'repo_name': repo_name})
+    return render(request, 'igenapp/graphs/graphs.html', {'data': data, 'owner_name': owner_name, 'repo_name': repo_name})
 
 def wiki(request, owner_name, repo_name):
     wikipages_list = WikiPage.objects.all()

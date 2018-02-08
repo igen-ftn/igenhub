@@ -34,6 +34,7 @@ urlpatterns = [
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/(?P<parent>[\w-]+)/(?P<parent_id>\d+)/comments/$', views.add_comment, name='add_comment'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/(?P<parent>[\w-]+)/(?P<parent_id>\d+)/comments/edit/$', views.edit_comment, name='edit_comment'),
     url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/(?P<parent>[\w-]+)/(?P<parent_id>\d+)/comments/delete/(?P<comment_id>\d+)/$', views.delete_comment, name='delete_comment'),
+    url(r'^(?P<owner_name>[\w-]+)/(?P<repo_name>[\w-]+)/graphs/$', views.graphs, name='graphs'),
     url(r'^signup/$', views.signup, name='signup'),
     url(r'^accounts/profile/$', views.editUser, name='editUser'),
     url(r'^accounts/profile/removeAvatar', views.remove_avatar, name='remove_avatar'),
