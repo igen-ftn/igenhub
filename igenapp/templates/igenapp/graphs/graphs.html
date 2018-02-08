@@ -39,12 +39,12 @@
         }
     </style>
     <script>
-        var margin = {top: 20, right: 30, bottom: 30, left: 40},
+        var margin = {top: 20, right: 30, bottom: 20, left: 40},
         width = 960 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
 
 
-        var x = d3.scaleBand().rangeRound([0, width])
+        var x = d3.scaleBand().rangeRound([0, width/4])
         var y = d3.scaleLinear()
             .range([height, 0]);
 
@@ -54,7 +54,7 @@
 
         var chart = d3.select(".chart")
             .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
+            .attr("height", height + margin.top + margin.bottom + 50)
           .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
         chart.append("g").append("text").style("font-size", "16px").text("Submitted Issues Count")
@@ -68,7 +68,7 @@
           chart.append("g")
               .attr("class", "x axis")
               .attr("transform", "translate(0," + height + ")")
-              .call(xAxis);
+              .call(xAxis).selectAll("text").style("text-anchor", "end").attr("transform", "rotate(-90)").attr("dx", "-.8em").attr("dy", "-.55em");
 
           chart.append("g")
               .attr("class", "y axis")
@@ -100,7 +100,7 @@
             height = 500 - margin.top - margin.bottom;
 
 
-            var x1 = d3.scaleBand().rangeRound([0, data11.length* width/9])
+            var x1 = d3.scaleBand().rangeRound([0, data11.length* width/15])
             var y1 = d3.scaleLinear()
                 .range([height, 0]);
 
@@ -110,7 +110,7 @@
 
             var chart1 = d3.select(".tt1").append("svg")
                 .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom)
+                .attr("height", height + margin.top + margin.bottom + 90)
               .append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
             chart1.append("g").append("text").style("font-size", "16px").text("Commits per user")
@@ -124,7 +124,7 @@
               chart1.append("g")
                   .attr("class", "x axis")
                   .attr("transform", "translate(0," + height + ")")
-                  .call(xAxis1);
+                  .call(xAxis1).selectAll("text").style("text-anchor", "end").attr("transform", "rotate(-90)").attr("dx", "-.8em").attr("dy", "-.55em");
 
               chart1.append("g")
                   .attr("class", "y axis")
