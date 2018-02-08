@@ -1,4 +1,4 @@
-from django.test import TestCase, RequestFactory
+from django.test import TestCase, RequestFactory, Client
 from .models import *
 from .forms import *
 from .views import *
@@ -16,7 +16,6 @@ class IssueTests(TestCase):
                                                     owner_name=self.user.username, type='L')
         self.issue = Issue.objects.create(title="Some Issue", text="This is first issue", ordinal=100,
                                           date=timezone.now(), status='O', user=self.user, repository=self.repository)
-
 
     """Creating new issue test"""
     def test_create_issue(self):
@@ -44,10 +43,31 @@ class IssueTests(TestCase):
         form = IssueForm(data=data)
         self.assertFalse(form.is_valid())
 
-    # """User acitvity test"""
-    # def test_activity(self):
-    #     response = self.client.get('polls:index')
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertContains(response, "No polls are available.")
-    #     self.assertQuerysetEqual(response.context['latest_question_list'], [])
+    """User activity test"""
+    def test_activity(self):
+        # Log in
+        self.client.force_login(self.user)
 
+        # Go to Repositories page
+        url = '/' + self.user.username + '/repositories/'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # There should be no activity
+        self.assertQuerysetEqual(response.context['activity'], [])
+
+        # Create issue
+        url = '/' + self.user.username + '/' + self.repository.repo_name + '/add_issue/0/'
+        response = self.client.post(url, {'title': "Issue", 'text': "This is form body", 'milestone': "null"})
+        self.assertEqual(response.status_code, 200)
+
+        # Go back to the repository page
+        url = '/' + self.user.username + '/repositories/'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # Activity set should not be empty
+        self.assertQuerysetEqual(response.context['activity'], ['<Activity: Activity object>'])
+
+        # Log out
+        self.client.logout()
