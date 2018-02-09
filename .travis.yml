@@ -31,7 +31,7 @@ addons:
     - sshpass
 before_deploy:
 - chmod +x ./deploy.sh
-- scp ./deploy.sh $HOST_IP:/home/uksdocker/tim-igen/
+- scp -o StrictHostKeyChecking=no ./deploy.sh $HOST_IP:/home/uksdocker/tim-igen/
 deploy:
   skip_cleanup: true
   provider: script
