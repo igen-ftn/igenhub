@@ -22,6 +22,7 @@ after_script:
 after_failure:
 - docker-compose down
 after_success:
+- rm -r postgres-data
 - docker build -t $DOCKER_HUB_USERNAME/igenhub .
 - docker push $DOCKER_HUB_USERNAME/igenhub:latest
 - export SSHPASS=$DEPLOY_PASS
