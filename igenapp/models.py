@@ -78,7 +78,7 @@ class Issue(models.Model):
     assignee = models.ManyToManyField(User, related_name='issue_assignees')
     label = models.ManyToManyField(Label)
     milestone = models.ForeignKey(Milestone, default=None, blank=True, null=True)
-    repository = models.ForeignKey(Repository)
+    repository = models.ForeignKey(Repository, null=True)
 
 
 class Activity(models.Model):
