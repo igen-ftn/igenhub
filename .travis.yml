@@ -21,7 +21,7 @@ after_script:
 - docker-compose down
 after_failure:
 - docker-compose down
-after success:
+after_success:
 - docker build -t $DOCKER_HUB_USERNAME/igenhub .
 - docker push $DOCKER_HUB_USERNAME/igenhub:latest
 - export SSHPASS=$DEPLOY_PASS
