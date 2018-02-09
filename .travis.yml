@@ -35,7 +35,7 @@ deploy:
   skip_cleanup: true
   provider: script
   script: chmod 600 deploy_key && sshpass -e ssh -o StrictHostKeyChecking=no -i ./deploy_key
-    $HOST@$HOST_IP 'cd home/uksdocker/tim-igen/ && ./deploy.sh'
+    $HOST@$HOST_IP 'cd /home/uksdocker/tim-igen/ && ./deploy.sh'
   on:
     branch: travis-try2
 env:
