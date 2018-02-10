@@ -12,6 +12,8 @@ from django.template import RequestContext
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+import json
+import datetime
 
 
 def index(request):
@@ -19,7 +21,6 @@ def index(request):
 
 
 def create_activity(request, owner_name, repo_name, text, link):
-    #Activity.objects.all().delete()
     repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
     Activity.objects.create(user=request.user, text=text, date=timezone.now(), link=link, repository=repository)
 
@@ -30,6 +31,41 @@ def home(request, owner_name=''):
     else:
         return render(request, 'igenapp/home.html', {'owner_name': ''})
 
+def graphs(request, owner_name, repo_name):
+    datan = []
+    repo = Repository.objects.get(repo_name=repo_name)
+    issues = Issue.objects.filter(repository=repo.id)
+    for i in range (6,-1,-1):
+        obj = {}
+        date = datetime.date.today() - datetime.timedelta(days=i)
+        obj["name"] = str(date)
+        issueCount = 0
+        for issue in issues:
+            if str(issue.date).split(" ")[0] == str(date):
+                issueCount += 1
+        obj["value"] = issueCount
+        datan.append(obj)
+    data = json.dumps(datan)
+    if repo.type == 'G':
+        result = requests.get('https://api.github.com/repos/%s/%s/commits' % (owner_name, repo_name))
+        commits = json.loads(result.content)
+        autori = dict()
+        if result:
+            for commit in commits:
+                if commit['commit']['committer']['name'] in autori.keys():
+                    autori[commit['commit']['committer']['name']] = autori[commit['commit']['committer']['name']] + 1
+                else:
+                    autori[commit['commit']['committer']['name']] = 0
+            sredjenZaD3 = []
+            for x in autori:
+                obj = {}
+                obj["name"] = x
+                obj["value"] = autori[x]
+                sredjenZaD3.append(obj)
+            autori = json.dumps(sredjenZaD3)
+            return render(request, 'igenapp/graphs/graphs.html',
+                          {'data': data, 'commits': autori, 'owner_name': owner_name, 'repo_name': repo_name})
+    return render(request, 'igenapp/graphs/graphs.html', {'data': data, 'owner_name': owner_name, 'repo_name': repo_name})
 
 def wiki(request, owner_name, repo_name):
     wikipages_list = WikiPage.objects.all()
@@ -94,30 +130,43 @@ def edit_wikipage(request, owner_name, repo_name, wikipage_id):
         return render(request, 'igenapp/wiki/form.html', {'form': form, 'owner_name': owner_name, 'repo_name': repo_name})
 
 
+def profile_preview(request, owner_name, user_id):
+    user = request.user
+    user_profile = User.objects.get(pk=user_id)
+    images = UserImage.objects.all()
+    repositories = Repository.objects.filter(author=request.user).all()
+    contribute_to = Repository.objects.filter(contributors=request.user).all()
+    all_repos = repositories | contribute_to
+    return render(request, 'igenapp/profile/profilePreview.html', {'owner_name': owner_name, 'user': user,
+                                                                   'images':images, 'user_profile': user_profile,
+                                                                   'repositories': all_repos})
+
+
 def issues(request, owner_name, repo_name):
     repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
     issues_list = Issue.objects.filter(repository=repository).order_by('-date')
-    user_list = User.objects.all() #DOBITI SAMO AUTORE
+    user_list = repository.contributors
     images = UserImage.objects.all()
     milestone_list = Milestone.objects.filter(repository=repository)
     return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list, 'milestones': milestone_list, 'images':images,
-                                                          'owner_name': owner_name, 'repo_name': repo_name })
+                                                          'owner_name': owner_name, 'repo_name': repo_name, 'repo': repository})
 
 
 def new_issue(request, owner_name, repo_name, issue_id):
     repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
     milestone_list = Milestone.objects.filter(repository=repository)
     label_list = Label.objects.filter(repository=repository)
-    users = User.objects.all() #DOBITI SAMO AUTORE
+    user_list = repository.contributors
     images = UserImage.objects.all()
     try:
         issue = Issue.objects.get(pk=issue_id)
         return render(request, 'igenapp/issues/new_issue.html', {'labels': label_list, 'milestones': milestone_list,
-                                                                 'issue': issue, 'users': users, 'images':images,
-                                                                 'owner_name': owner_name, 'repo_name': repo_name})
+                                                                 'issue': issue, 'users': user_list, 'images':images,
+                                                                 'owner_name': owner_name, 'repo_name': repo_name,
+                                                                 'repo': repository})
     except Issue.DoesNotExist:
         return render(request, 'igenapp/issues/new_issue.html', {'labels': label_list, 'milestones': milestone_list,
-                                                                 'users': users, 'images':images,
+                                                                 'users': user_list, 'images':images, 'repo': repository,
                                                                  'owner_name': owner_name, 'repo_name': repo_name})
 
 
@@ -153,12 +202,12 @@ def add_issue(request, owner_name, repo_name, issue_id):
 
     repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
     issues_list = Issue.objects.filter(repository=repository).order_by('-date')
-    user_list = User.objects.all()  # DOBITI SAMO AUTORE
+    user_list = repository.contributors
     milestone_list = Milestone.objects.filter(repository=repository)
     images = UserImage.objects.all()
     return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list, 'images':images,
                                                           'milestones': milestone_list, 'owner_name': owner_name,
-                                                          'repo_name': repo_name})
+                                                          'repo_name': repo_name, 'repo': repository})
 
 
 def issue_labels(request, issue):
@@ -250,12 +299,12 @@ def close(request, owner_name, repo_name, issue_id):
 
     repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
     issues_list = Issue.objects.filter(repository=repository).order_by('-date')
-    user_list = User.objects.all()  # DOBITI SAMO AUTORE
+    user_list = repository.contributors
     milestone_list = Milestone.objects.filter(repository=repository)
     images = UserImage.objects.all()
     return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list, 'images':images,
                                                           'milestones': milestone_list, 'owner_name': owner_name,
-                                                          'repo_name': repo_name})
+                                                          'repo_name': repo_name, 'repo': repository})
 
 
 def search(request, owner_name, repo_name):
@@ -272,11 +321,11 @@ def search(request, owner_name, repo_name):
     if status != 'null':
         issues_list = issues_list.filter(status=status)
 
-    user_list = User.objects.all()  # DOBITI SAMO AUTORE
+    user_list = repository.contributors
     milestone_list = Milestone.objects.filter(repository=repository)
     images = UserImage.objects.all()
     return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list, 'images':images,
-                                    'milestones': milestone_list, 'owner_name': owner_name, 'repo_name': repo_name})
+                 'milestones': milestone_list, 'owner_name': owner_name, 'repo_name': repo_name, 'repo': repository})
 
 
 def milestones(request, owner_name, repo_name):
