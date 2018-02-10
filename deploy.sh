@@ -1,6 +1,6 @@
 #!/bin/bash
 touch docker-compose.yml
-echo "version: '3'" > docker-compose.yml
+echo "version: '2'" > docker-compose.yml
 echo "services:" >> docker-compose.yml
 echo "    db:"  >> docker-compose.yml
 echo "        image: postgres" >> docker-compose.yml
