@@ -461,6 +461,28 @@ def delete_repository(request, owner_name, repository_id):
     return redirect('/' + owner_name + '/repositories')
 
 
+def edit_repository(request, owner_name, repository_id):
+    repository = Repository.objects.filter(pk=repository_id).first()
+    users = User.objects.all().exclude(username=owner_name)
+
+    return render(request, 'igenapp/repository/edit_repository.html',
+                  {'users': users, 'repository': repository, 'owner_name': owner_name})
+
+
+def edit_repository_byid(request, owner_name, repository_id):
+    if request.method == "POST":
+        repository = Repository.objects.filter(pk=repository_id).first()
+        repository.contributors.clear()
+        contributors = request.POST.getlist('contributors')
+        for contributor in contributors:
+            repository.contributors.add(contributor)
+        repository.save()
+
+        return redirect('/' + owner_name + '/repositories')
+    else:
+        return redirect('/' + owner_name + '/repository/edit/' + repository_id)
+
+
 def add_repository(request, owner_name):
     if request.method == "POST":
         error = True
