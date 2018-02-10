@@ -1,19 +1,16 @@
 version: '3'
-
 services:
-  db:
-    image: postgres
-    volumes:
-        - ./postgres-data:/var/lib/postgresql/data
-    command: -p 8022
-  web:
-    build: .
-    #command: python3 manage.py migrate
-    #command: python3 manage.py makemigrations igenapp
-    command: python3 manage.py runserver 0.0.0.0:8021
-    volumes:
-      - .:/code
-    ports:
-      - "8021:8021"
-    depends_on:
-      - db
+    db:
+        image: postgres
+        command: -p 8022
+        volumes:
+            - ./postgres-data:/var/lib/postgresql/data
+    web:
+        build: .
+        volumes:
+            - ./igenapp/media:/code/igenapp/media
+            - .:/code
+        ports:
+            - "8021:8021"
+        depends_on:
+            - db

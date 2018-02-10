@@ -1,9 +1,10 @@
 FROM python:3
 ENV PYTHONUNBUFFERED 1
 RUN mkdir /code
-WORKDIR /code
-ADD requirements.txt /code/
-RUN pip install -r requirements.txt
-ADD . /code/
+ADD requirements.txt /code
+RUN pip install -r /code/requirements.txt
+ADD . /code
+VOLUME /code/igenapp/media
 EXPOSE 8021
-CMD python /code/manage.py runserver 0.0.0.0:8023
+WORKDIR /code
+CMD python manage.py runserver 0.0.0.0:8021

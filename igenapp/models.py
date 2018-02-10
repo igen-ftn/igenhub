@@ -105,5 +105,5 @@ class Comment(models.Model):
     date = models.DateTimeField(null=True)
 
 class UserImage(models.Model):
-    user = models.OneToOneField(to=User, null=False, blank=True, primary_key=True, to_field='id')
+    user = models.ForeignKey(to=User, null=False, unique=True, blank=True, primary_key=True, to_field='id')
     avatar = models.ImageField(upload_to='avatars', blank=True)

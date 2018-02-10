@@ -526,6 +526,7 @@ def signup(request):
         else:
             context = dict()
             context['form'] = form
+            context['image'] = ImageForm()
             context['message'] = "Error has occured"
             return render(request, 'igenapp/users/signup.html', context)
     else:
