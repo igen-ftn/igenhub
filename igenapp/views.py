@@ -607,6 +607,16 @@ def add_comment(request, owner_name, repo_name, parent, parent_id):
             create_activity(request, owner_name, repo_name, ' left comment on issue ' + comment.issue.title,
                             '/' + owner_name + '/' + repo_name + '/issues/' + str(comment.issue.id))
             return redirect('issue_details', owner_name, repo_name, parent_id)
+        elif parent == 'task':
+            comment = Comment()
+            comment.content = request.POST['content']
+            comment.user = request.user
+            comment.date = timezone.now()
+            comment.task = Task.objects.get(id=parent_id)
+            comment.save()
+            create_activity(request, owner_name, repo_name, ' left comment on task ' + comment.task.title,
+                            '/' + owner_name + '/' + repo_name + '/task-page/' + str(comment.task.id))
+            return redirect('task-page', owner_name, repo_name, parent_id)
         else:
             comment = Comment()
             comment.content = request.POST['content']
@@ -627,8 +637,11 @@ def edit_comment(request, owner_name, repo_name, parent, parent_id):
         comment.save()
         if parent == 'issue':
             return redirect('issue_details', owner_name, repo_name, parent_id)
+        elif parent == 'task':
+            return redirect('task-page', owner_name, repo_name, parent_id)
         else:
             return redirect('wiki-page', owner_name, repo_name, parent_id)
+
 
 def delete_comment(request, owner_name, repo_name, parent, parent_id, comment_id):
     if request.method == "POST":
@@ -636,9 +649,83 @@ def delete_comment(request, owner_name, repo_name, parent, parent_id, comment_id
         comment.delete()
         if parent == 'issue':
             return redirect('issue_details', owner_name, repo_name, parent_id)
+        elif parent == 'task':
+            return redirect('task-page', owner_name, repo_name, parent_id)
         else:
             return redirect('wiki-page', owner_name, repo_name, parent_id)
 
 
 def landing(request, owner_name, repo_name):
     return render(request, 'igenapp/landingpage.html', owner_name, repo_name)
+
+
+def task(request, owner_name, repo_name):
+    tasks_list = Task.objects.all()
+    return render(request, 'igenapp/task/tasks.html', {'tasks': tasks_list, 'owner_name': owner_name, 'repo_name': repo_name})
+
+
+def task_form(request, owner_name, repo_name):
+    if request.method == "POST":
+        form = TaskForm(request.POST)
+        if form.is_valid():
+            form.save()
+            create_activity(request, owner_name, repo_name, ' created task page ', '/'+owner_name+'/'+repo_name+'/task')
+            return redirect('task', owner_name, repo_name)
+        else:
+            context = dict()
+            context['form'] = form
+            context['message'] = "Error has occured:"
+            context['owner_name'] = owner_name
+            context['repo_name'] = repo_name
+            return render(request, 'igenapp/task/form.html', context)
+    else:
+        form = TaskForm()
+        return render(request, 'igenapp/task/form.html', {'form': form, 'owner_name': owner_name, 'repo_name': repo_name})
+
+
+def task_page(request, owner_name, repo_name, task_id):
+    taskpage = get_object_or_404(Task, pk=task_id)
+    comments = Comment.objects.filter(task=taskpage).order_by('date')
+    images = UserImage.objects.all()
+    return render(request, 'igenapp/task/page.html', {'task': taskpage, 'comments': comments, 'images':images,
+                                                                 'owner_name': owner_name, 'repo_name': repo_name})
+
+
+def remove_task(request, owner_name, repo_name, task_id):
+    Task.objects.filter(pk=task_id).delete()
+    create_activity(request, owner_name, repo_name, ' removed task page ', '/' + owner_name + '/' + repo_name + '/wiki')
+    task_list = Task.objects.all()
+    return redirect('task', owner_name, repo_name)
+
+
+def edit_task(request, owner_name, repo_name, task_id):
+    if request.method == "POST":
+        taskpage = Task.objects.filter(pk=task_id).first()
+        form = TaskForm(request.POST, instance=taskpage)
+        if form.is_valid():
+
+            form.save()
+            return redirect('task', owner_name, repo_name)
+        else:
+            context = dict()
+            context['form'] = form
+            context['message'] = "Error has occured:"
+            context['owner_name'] = owner_name
+            context['repo_name'] = repo_name
+            return render(request, 'igenapp/task/form.html', context)
+    else:
+        taskpage = Task.objects.filter(pk=task_id).first()
+        form = TaskForm(instance=taskpage)
+        return render(request, 'igenapp/task/form.html', {'form': form, 'owner_name': owner_name, 'repo_name': repo_name})
+
+
+def search_task(request, owner_name, repo_name):
+    title = request.POST.get('title')
+
+    #repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
+    #tasks_list = Task.objects.filter(repository=repository).order_by('-date')
+    #if title != 'null':
+    #    tasks_list = tasks_list.filter(title=title)
+    tasks_list = Task.objects.filter(title__contains=title)
+    return render(request, 'igenapp/task/tasks.html',
+                  {'tasks': tasks_list, 'owner_name': owner_name, 'repo_name': repo_name})

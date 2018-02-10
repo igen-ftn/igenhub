@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block navbar %}
+  <li><a href="{% url 'home' owner_name %}">Home</a></li>
+  <li><a href="/{{owner_name}}/repositories">Repositories</a></li>
+  <li><a href="/{{owner_name}}/{{repo_name}}/wiki">Wiki</a></li>
+  <li><a href="/{{owner_name}}/{{repo_name}}/issues">Issues</a></li>
+  <li><a href="/{{owner_name}}/{{repo_name}}/commits/">Commits</a></li>
+  <li><a href="/{{owner_name}}/{{repo_name}}/graphs/">Graphs</a></li>
+  <li class="active"><a href="/{{owner_name}}/{{repo_name}}/tasks/">Tasks</a></li>
+{% endblock %}
+
+{% block body %}
+<h1>Task Form</h1>
+<label>Repository: {{repo_name}} | Owner: {{owner_name}}</label>
+<br /><br />
+<form method = "POST" class="form-horizontal">
+    {% csrf_token %}
+    <div class="col-md-12">
+      {{ form.title }}
+      Status: {{ form.status }} done.
+    </div>
+    <br/>
+    <div class="col-md-12">
+      {{ form.description }}
+    </div>
+    <br/>
+    <br/>
+    <button type="submit" class="save btn btn-md btn-primary">Save</button>
+</form>
+{% endblock %}

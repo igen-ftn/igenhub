@@ -93,7 +93,14 @@ class Activity(models.Model):
 class WikiPage(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=100)
-    content = models.CharField(max_length=1000)
+    content = models.CharField(max_length=4000)
+
+
+class Task(models.Model):
+    id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=100)
+    description = models.CharField(max_length=1000)
+    status = models.CharField(max_length=40)
 
 
 class Comment(models.Model):
@@ -101,9 +108,13 @@ class Comment(models.Model):
     user = models.ForeignKey(to=User, null=False)
     issue = models.ForeignKey(to=Issue, null=True)
     wiki = models.ForeignKey(to=WikiPage, null=True)
+    task = models.ForeignKey(to=Task, null=True)
     content = models.CharField(max_length=1000)
     date = models.DateTimeField(null=True)
+
 
 class UserImage(models.Model):
     user = models.OneToOneField(to=User, null=False, blank=True, primary_key=True, to_field='id')
     avatar = models.ImageField(upload_to='avatars', blank=True)
+
+

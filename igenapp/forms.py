@@ -63,3 +63,28 @@ class ImageForm(forms.ModelForm):
     class Meta:
         model = UserImage
         fields = ['avatar']
+
+
+STATUS_CHOICES = [
+    ('0%', '0%'),
+    ('10%', '10%'),
+    ('20%', '20%'),
+    ('30%', '30%'),
+    ('40%', '40%'),
+    ('50%', '50%'),
+    ('60%', '60%'),
+    ('70%', '70%'),
+    ('80%', '80%'),
+    ('90%', '90%'),
+    ('100%', '100%'),
+
+]
+
+class TaskForm(forms.ModelForm):
+    title = forms.CharField()
+    description = forms.CharField(widget=forms.Textarea)
+    status = forms.CharField(widget=forms.Select(choices=STATUS_CHOICES))
+
+    class Meta:
+        model = Task
+        fields = '__all__'

@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% block head %}
+{% load staticfiles %}
+<script src="{% static 'igenapp/comment.js' %}"></script>
+{% endblock%}
+{% block navbar %}
+    <li><a href="{% url 'home' owner_name %}">Home</a></li>
+    <li><a href="/{{owner_name}}/repositories">Repositories</a></li>
+    <li><a href="/{{owner_name}}/{{repo_name}}/wiki">Wiki</a></li>
+    <li><a href="/{{owner_name}}/{{repo_name}}/issues">Issues</a></li>
+    <li><a href="/{{owner_name}}/{{repo_name}}/commits/">Commits</a></li>
+    <li><a href="/{{owner_name}}/{{repo_name}}/graphs/">Graphs</a></li>
+    <li class="active"><a href="/{{owner_name}}/{{repo_name}}/tasks/">Tasks</a></li>
+{% endblock %}
+
+{% block body %}
+{% load igenapp_extras %}
+<div class="row">
+  <div class="row">
+    <div class="col-md-8">
+      <h2>{{task.title}}</h2>
+    </div>
+    <div class="col-md-4">
+      <div class="btn-group">
+        <a href="/{{owner_name}}/{{repo_name}}/tasks/" class="btn btn-primary">Back To Tasks</a>
+        <a href="/{{owner_name}}/{{repo_name}}/task-edit/{{task.id}}" class="btn btn-warning">Edit</a>
+        <a href="/{{owner_name}}/{{repo_name}}/task-remove/{{task.id}}" class="btn btn-danger">Delete</a>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    Status: {{task.status}} done.
+  </div>
+  <div class="col-md-12 col-lg-11 container panel row">
+      <p class="col-md-12 col-lg-11" style="word-break: break-all">{{task.description}}</p>
+  </div>
+</div>
+
+<!-- comments -->
+{% for comment in comments %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-1">
+            <div class="thumbnail">
+                {% if comment.user|ifinlist:images %}
+                    {% for image in images %}
+                        {% if image.user == comment.user %}
+                            <img class="img-responsive user-photo" src="{{image.avatar.url}}">
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <img src="http://bootdey.com/img/Content/user_1.jpg" class="img-responsive user-photo" alt="profile picture"/>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-sm-5">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        {% if comment.user.username == user.username %}
+                            <form action="{% url 'delete_comment' owner_name repo_name 'task' task.id comment.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-default glyphicon glyphicon-remove pull-right pagination-centered"></button>
+                            </form>
+                            <button class="btn btn-sm btn-default glyphicon glyphicon-pencil pull-right pagination-centered" onclick="editComment('{{comment.content}}', {{comment.id}}, '{{owner_name}}', '{{repo_name}}', {{issue.id}})"></button>
+                        {% endif %}
+                        <b>&nbsp; {{comment.user.username}}</b>
+                        <span class="text-muted pull-right">{{comment.date}}</span>
+                    </div>
+                </div>
+                <form method="post" action="{% url 'edit_comment' owner_name repo_name 'task' task.id %}">
+                    {% csrf_token %}
+                    <div class="panel-body" id="editCom{{comment.id}}">
+                        {{comment.content}}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+<!-- write new comment -->
+{% if user.is_authenticated %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-1">
+                <div class="thumbnail">
+                    {% if user|ifinlist:images %}
+                        {% for image in images %}
+                            {% if image.user == user %}
+                                <img class="img-responsive user-photo" src="{{image.avatar.url}}">
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <img src="http://bootdey.com/img/Content/user_1.jpg"/>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-sm-5">
+                <form action="{% url 'add_comment' owner_name repo_name 'task' task.id %}" method="post">
+                    {% csrf_token %}
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <strong>{{user.username}}</strong>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <textarea id="content" name="content" rows="4" class="form-control" placeholder="Write a comment.."></textarea>
+                            </div>
+                            <div class="row">
+                                <input type="Submit" class="pull-right btn btn-success" value="Comment"/>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock body %}
