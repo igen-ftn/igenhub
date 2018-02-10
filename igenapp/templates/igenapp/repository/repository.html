@@ -87,7 +87,7 @@
     <div class="col-sm-8">
         <h4>Activity:</h4>
         {% for act in activity %}
-            <p style="width:90%"><span class="glyphicon glyphicon-user"></span> <b>{{act.user}}</b> <i><a href="{{act.link}}">{{act.text}} </a></i> in <b>{{act.repository.repo_name}}</b>
+            <p style="width:90%"><span class="glyphicon glyphicon-user"></span> <a style="color: #333;" href="/{{owner_name}}/profilePreview/{{act.user.id}}"><b>{{act.user}}</b></a> <i><a href="{{act.link}}">{{act.text}} </a></i> in <b>{{act.repository.repo_name}}</b>
             &nbsp;&nbsp;<span style="float:right">&nbsp;{{act.date}}</span><span style="float:right" class="glyphicon glyphicon-calendar"></span>
             </p>
         {% endfor %}
