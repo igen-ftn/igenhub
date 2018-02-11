@@ -402,7 +402,7 @@ def commits(request, owner_name, repo_name):
         #return render(request, 'igenapp/commits/commits.html',
                       #{'repo_info': {'owner_name': owner_name, 'repo_name': repo_name}})
 
-    result = requests.get('https://api.github.com/repos/%s/%s/commits' % (owner_name, repo_name), params={'Content-Type':'application/json','Accept':'application/vnd.github.v3+json', 'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0'})
+    result = requests.get('https://api.github.com/repos/%s/%s/commits' % (owner_name, repo_name), data={'Content-Type':'application/json','Accept':'application/vnd.github.v3+json', 'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0'})
     commits = json.loads(result.content.decode('utf-8'))
 
     try:
