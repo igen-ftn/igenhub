@@ -10,7 +10,7 @@
     {% block navbar %}
       <li><a href="{% url 'home' owner_name %}">Home</a></li>
       <li><a href="/{{owner_name}}/repositories">Repositories</a></li>
-      <li class="active"><a href="/{{owner_name}}/{{repo_name}}/wiki">Wiki</a></li>
+      <li><a href="/{{owner_name}}/{{repo_name}}/wiki">Wiki</a></li>
       <li><a href="/{{owner_name}}/{{repo_name}}/issues">Issues</a></li>
       <li><a href="/{{owner_name}}/{{repo_name}}/commits/">Commits</a></li>
       <li><a href="/{{owner_name}}/{{repo_name}}/graphs/">Graphs</a></li>
@@ -20,15 +20,22 @@
     {% block body %}
     <h1>Tasks</h1>
     <label>Repository: {{repo_name}} | Owner: {{owner_name}}</label>
-    <br><br>
+    <br/>
     <div class="row">
       <div class="col-md-8">
         <form class="form-inline" action="/{{owner_name}}/{{repo_name}}/tasks/search/" method="POST">{% csrf_token %}
             <div class="form-group">
-                <label class="filter-col" style="margin-right:10px;">Search:</label>
-                <input class="form-control" name="title">
-
-              </input>
+                <label class="filter-col" style="margin-right:10px;">Search By Title:</label>
+                <input class="form-control" name="title"></input>
+            </div>
+            <div class="form-group">
+                <label class="filter-col" style="margin-right:10px;">By Assignee:</label>
+                <select class="form-control" id="sel1" name='user'>
+                  <option value=""></option>
+                  {% for user in users %}
+                  <option value={{user.id}}>{{user.first_name}} {{user.last_name}}</option>
+                  {% endfor %}
+                </select>
             </div>
             <div class="form-group">
                 <button type="submit">
@@ -38,7 +45,7 @@
         </form>
       </div>
     </div>
-
+    <br/>
     <div class="row">
       <div class="btn-group">
         <a href="/{{owner_name}}/{{repo_name}}/task-form/" class="btn btn-primary">+ New Task</a>
@@ -48,7 +55,7 @@
     <div class="row">
       <div class="list-group">
         {% for task in tasks %}
-        <a href="/{{owner_name}}/{{repo_name}}/task-page/{{task.id}}" class="list-group-item">{{task.title}}</a>
+        <a href="/{{owner_name}}/{{repo_name}}/task-page/{{task.id}}" class="list-group-item">{{task.title}} <span class="badge">{{task.user.username}}</span></a>
         {% endfor %}
       </div>
     </div>

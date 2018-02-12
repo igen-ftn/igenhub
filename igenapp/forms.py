@@ -80,11 +80,18 @@ STATUS_CHOICES = [
 
 ]
 
+class UserModelChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+         return obj.get_full_name()
+
 class TaskForm(forms.ModelForm):
+    users = User.objects.all()
+    USERS_CHOICES = [tuple([user, user.first_name + ' ' + user.last_name]) for user in users]
     title = forms.CharField()
     description = forms.CharField(widget=forms.Textarea)
     status = forms.CharField(widget=forms.Select(choices=STATUS_CHOICES))
-
+    user = UserModelChoiceField( queryset=User.objects.all() )
+#widget=forms.Select(choices=USERS_CHOICES)
     class Meta:
         model = Task
         fields = '__all__'

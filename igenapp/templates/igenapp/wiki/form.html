@@ -16,10 +16,11 @@
 <form method = "POST" class="form-horizontal">
     {% csrf_token %}
     <div class="col-md-12">
-      {{ form.title }}
+      <label>Title: </label> {{ form.title }}
     </div>
     <br/>
     <div class="col-md-12">
+      <label>Content: </label><br/>
       {{ form.content }}
     </div>
     <br/>

@@ -17,11 +17,15 @@
 <form method = "POST" class="form-horizontal">
     {% csrf_token %}
     <div class="col-md-12">
-      {{ form.title }}
-      Status: {{ form.status }} done.
+      <label>Title: </label> {{ form.title }}
+      <label>Status: </label> {{ form.status }} done.
+    </div>
+    <div class="col-md-12">
+      <label>Assign to: </label> {{ form.user }}
     </div>
     <br/>
     <div class="col-md-12">
+      <label>Description:</label><br/>
       {{ form.description }}
     </div>
     <br/>

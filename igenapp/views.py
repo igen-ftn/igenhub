@@ -69,7 +69,9 @@ def graphs(request, owner_name, repo_name):
     return render(request, 'igenapp/graphs/graphs.html', {'data': data, 'owner_name': owner_name, 'repo_name': repo_name})
 
 def wiki(request, owner_name, repo_name):
-    wikipages_list = WikiPage.objects.all()
+    repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
+    wikipages_list = WikiPage.objects.filter(repository=repository)
+    #wikipages_list = WikiPage.objects.all()
     return render(request, 'igenapp/wiki.html', {'wikipages': wikipages_list, 'owner_name': owner_name, 'repo_name': repo_name})
     #return render(request, 'igenapp/wiki.html')
 
@@ -78,7 +80,10 @@ def wiki_form(request, owner_name, repo_name):
     if request.method == "POST":
         form = WikiForm(request.POST)
         if form.is_valid():
-            form.save()
+            repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
+            wiki = WikiPage(title=form.cleaned_data['title'], content=form.cleaned_data['content'], repository=repository)
+            wiki.save()
+            #form.save()
             create_activity(request, owner_name, repo_name, ' created wiki page ', '/'+owner_name+'/'+repo_name+'/wiki')
             return redirect('wiki', owner_name, repo_name)
         else:
@@ -115,7 +120,6 @@ def edit_wikipage(request, owner_name, repo_name, wikipage_id):
         wikipage = WikiPage.objects.filter(pk=wikipage_id).first()
         form = WikiForm(request.POST, instance=wikipage)
         if form.is_valid():
-
             form.save()
             return redirect('wiki', owner_name, repo_name)
         else:
@@ -129,6 +133,14 @@ def edit_wikipage(request, owner_name, repo_name, wikipage_id):
         wikipage = WikiPage.objects.filter(pk=wikipage_id).first()
         form = WikiForm(instance=wikipage)
         return render(request, 'igenapp/wiki/form.html', {'form': form, 'owner_name': owner_name, 'repo_name': repo_name})
+
+
+def search_wiki(request, owner_name, repo_name):
+    title = request.POST.get('title')
+    repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
+    wikipages_list = WikiPage.objects.filter(title__contains=title, repository=repository)
+    return render(request, 'igenapp/wiki.html', {'wikipages': wikipages_list, 'owner_name': owner_name, 'repo_name': repo_name})
+
 
 
 def issues(request, owner_name, repo_name):
@@ -660,15 +672,18 @@ def landing(request, owner_name, repo_name):
 
 
 def task(request, owner_name, repo_name):
+    users = User.objects.all()
     tasks_list = Task.objects.all()
-    return render(request, 'igenapp/task/tasks.html', {'tasks': tasks_list, 'owner_name': owner_name, 'repo_name': repo_name})
+    return render(request, 'igenapp/task/tasks.html', {'tasks': tasks_list, 'users':users, 'owner_name': owner_name, 'repo_name': repo_name})
 
 
 def task_form(request, owner_name, repo_name):
     if request.method == "POST":
         form = TaskForm(request.POST)
         if form.is_valid():
-            form.save()
+            repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
+            task = Task(title=form.cleaned_data['title'], description=form.cleaned_data['description'], status=form.cleaned_data['status'] , repository=repository, user=form.cleaned_data['user'])
+            task.save()
             create_activity(request, owner_name, repo_name, ' created task page ', '/'+owner_name+'/'+repo_name+'/task')
             return redirect('task', owner_name, repo_name)
         else:
@@ -720,12 +735,21 @@ def edit_task(request, owner_name, repo_name, task_id):
 
 
 def search_task(request, owner_name, repo_name):
+    print(request.POST)
     title = request.POST.get('title')
+    user_id = request.POST.get('user')
 
-    #repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
+    users = User.objects.all()
+    repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
+
     #tasks_list = Task.objects.filter(repository=repository).order_by('-date')
     #if title != 'null':
     #    tasks_list = tasks_list.filter(title=title)
-    tasks_list = Task.objects.filter(title__contains=title)
+    if user_id != "":
+        user = get_object_or_404(User, id=user_id)
+        tasks_list = Task.objects.filter(title__contains=title, repository=repository, user=user)
+    else:
+        tasks_list = Task.objects.filter(title__contains=title, repository=repository)
+
     return render(request, 'igenapp/task/tasks.html',
-                  {'tasks': tasks_list, 'owner_name': owner_name, 'repo_name': repo_name})
+                  {'tasks': tasks_list, 'users':users, 'owner_name': owner_name, 'repo_name': repo_name})

@@ -29,7 +29,8 @@
     </div>
   </div>
   <div class="row">
-    Status: {{task.status}} done.
+    <label>Assigned to: </label> {{task.user.first_name}} {{task.user.last_name}}
+    <label>  Status: </label> {{task.status}} done.
   </div>
   <div class="col-md-12 col-lg-11 container panel row">
       <p class="col-md-12 col-lg-11" style="word-break: break-all">{{task.description}}</p>
