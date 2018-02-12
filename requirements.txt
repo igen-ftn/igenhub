@@ -4,3 +4,4 @@ requests==2.18.4
 simplejson==3.13.2
 Pillow
 django-cleanup
+pyopenssl

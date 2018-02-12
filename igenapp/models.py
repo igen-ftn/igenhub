@@ -22,7 +22,7 @@ class RepositoryInfo:
 
 class Repository(models.Model):
     id = models.AutoField(primary_key=True)
-    author = models.ForeignKey(User)
+    author = models.ForeignKey(User, null=True)
     repo_name = models.CharField(max_length=70)
     owner_name = models.CharField(max_length=70)
     TYPE_CHOICE = (
@@ -38,7 +38,7 @@ class Label(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=20)
     color = models.CharField(max_length=7)
-    repository = models.ForeignKey(Repository)
+    repository = models.ForeignKey(Repository, null=True)
 
 
 class Milestone(models.Model):
@@ -52,12 +52,12 @@ class Milestone(models.Model):
         ('C', 'Closed'),
     )
     status = models.CharField(max_length=1, choices=STATUS_CHOICE, default='O')
-    repository = models.ForeignKey(Repository)
+    repository = models.ForeignKey(Repository, null=True)
 
 
 class IssueHistory(models.Model):
     id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, null=True)
     text = models.CharField(max_length=50)
     date = models.DateTimeField()
 
@@ -74,20 +74,20 @@ class Issue(models.Model):
     )
     status = models.CharField(max_length=1, choices=STATUS_CHOICE, default='O')
     history = models.ManyToManyField(IssueHistory)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, null=True)
     assignee = models.ManyToManyField(User, related_name='issue_assignees')
     label = models.ManyToManyField(Label)
     milestone = models.ForeignKey(Milestone, default=None, blank=True, null=True)
-    repository = models.ForeignKey(Repository)
+    repository = models.ForeignKey(Repository, null=True)
 
 
 class Activity(models.Model):
     id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, null=True)
     text = models.CharField(max_length=50)
     date = models.DateTimeField()
     link = models.CharField(max_length=100)
-    repository = models.ForeignKey(Repository)
+    repository = models.ForeignKey(Repository, null=True)
 
 
 class WikiPage(models.Model):
@@ -98,12 +98,12 @@ class WikiPage(models.Model):
 
 class Comment(models.Model):
     id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(to=User, null=False)
+    user = models.ForeignKey(to=User, null=True)
     issue = models.ForeignKey(to=Issue, null=True)
     wiki = models.ForeignKey(to=WikiPage, null=True)
     content = models.CharField(max_length=1000)
     date = models.DateTimeField(null=True)
 
 class UserImage(models.Model):
-    user = models.OneToOneField(to=User, null=False, blank=True, primary_key=True, to_field='id')
+    user = models.ForeignKey(to=User, null=False, unique=True, blank=True, primary_key=True, to_field='id')
     avatar = models.ImageField(upload_to='avatars', blank=True)
