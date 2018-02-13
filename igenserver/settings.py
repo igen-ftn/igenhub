@@ -25,7 +25,7 @@ SECRET_KEY = '=#eb*7#pqdi=wgt*u+z1-1np&#voc$vkj$4b0w4mf$1*b!x1fi'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['147.91.177.194', '0.0.0.0', '127.0.0.1', 'localhost', 'api.github.com', 'https://api.github.com']
 
 
 # Application definition
@@ -81,7 +81,7 @@ DATABASES = {
         'NAME': 'postgres',
         'USER': 'postgres',
         'HOST': 'db',
-        'PORT': 5432,
+        'PORT': 8022,
     }
 }
 

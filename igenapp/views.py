@@ -21,7 +21,6 @@ def index(request):
 
 
 def create_activity(request, owner_name, repo_name, text, link):
-    #Activity.objects.all().delete()
     repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
     Activity.objects.create(user=request.user, text=text, date=timezone.now(), link=link, repository=repository)
 
@@ -142,31 +141,43 @@ def search_wiki(request, owner_name, repo_name):
     return render(request, 'igenapp/wiki.html', {'wikipages': wikipages_list, 'owner_name': owner_name, 'repo_name': repo_name})
 
 
+def profile_preview(request, owner_name, user_id):
+    user = request.user
+    user_profile = User.objects.get(pk=user_id)
+    images = UserImage.objects.all()
+    repositories = Repository.objects.filter(author=request.user).all()
+    contribute_to = Repository.objects.filter(contributors=request.user).all()
+    all_repos = repositories | contribute_to
+    return render(request, 'igenapp/profile/profilePreview.html', {'owner_name': owner_name, 'user': user,
+                                                                   'images':images, 'user_profile': user_profile,
+                                                                   'repositories': all_repos})
+
 
 def issues(request, owner_name, repo_name):
     repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
     issues_list = Issue.objects.filter(repository=repository).order_by('-date')
-    user_list = User.objects.all() #DOBITI SAMO AUTORE
+    user_list = repository.contributors
     images = UserImage.objects.all()
     milestone_list = Milestone.objects.filter(repository=repository)
     return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list, 'milestones': milestone_list, 'images':images,
-                                                          'owner_name': owner_name, 'repo_name': repo_name })
+                                                          'owner_name': owner_name, 'repo_name': repo_name, 'repo': repository})
 
 
 def new_issue(request, owner_name, repo_name, issue_id):
     repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
     milestone_list = Milestone.objects.filter(repository=repository)
     label_list = Label.objects.filter(repository=repository)
-    users = User.objects.all() #DOBITI SAMO AUTORE
+    user_list = repository.contributors
     images = UserImage.objects.all()
     try:
         issue = Issue.objects.get(pk=issue_id)
         return render(request, 'igenapp/issues/new_issue.html', {'labels': label_list, 'milestones': milestone_list,
-                                                                 'issue': issue, 'users': users, 'images':images,
-                                                                 'owner_name': owner_name, 'repo_name': repo_name})
+                                                                 'issue': issue, 'users': user_list, 'images':images,
+                                                                 'owner_name': owner_name, 'repo_name': repo_name,
+                                                                 'repo': repository})
     except Issue.DoesNotExist:
         return render(request, 'igenapp/issues/new_issue.html', {'labels': label_list, 'milestones': milestone_list,
-                                                                 'users': users, 'images':images,
+                                                                 'users': user_list, 'images':images, 'repo': repository,
                                                                  'owner_name': owner_name, 'repo_name': repo_name})
 
 
@@ -202,12 +213,12 @@ def add_issue(request, owner_name, repo_name, issue_id):
 
     repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
     issues_list = Issue.objects.filter(repository=repository).order_by('-date')
-    user_list = User.objects.all()  # DOBITI SAMO AUTORE
+    user_list = repository.contributors
     milestone_list = Milestone.objects.filter(repository=repository)
     images = UserImage.objects.all()
     return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list, 'images':images,
                                                           'milestones': milestone_list, 'owner_name': owner_name,
-                                                          'repo_name': repo_name})
+                                                          'repo_name': repo_name, 'repo': repository})
 
 
 def issue_labels(request, issue):
@@ -299,12 +310,12 @@ def close(request, owner_name, repo_name, issue_id):
 
     repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
     issues_list = Issue.objects.filter(repository=repository).order_by('-date')
-    user_list = User.objects.all()  # DOBITI SAMO AUTORE
+    user_list = repository.contributors
     milestone_list = Milestone.objects.filter(repository=repository)
     images = UserImage.objects.all()
     return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list, 'images':images,
                                                           'milestones': milestone_list, 'owner_name': owner_name,
-                                                          'repo_name': repo_name})
+                                                          'repo_name': repo_name, 'repo': repository})
 
 
 def search(request, owner_name, repo_name):
@@ -321,11 +332,11 @@ def search(request, owner_name, repo_name):
     if status != 'null':
         issues_list = issues_list.filter(status=status)
 
-    user_list = User.objects.all()  # DOBITI SAMO AUTORE
+    user_list = repository.contributors
     milestone_list = Milestone.objects.filter(repository=repository)
     images = UserImage.objects.all()
     return render(request, 'igenapp/issues/issues.html', {'issues': issues_list, 'users': user_list, 'images':images,
-                                    'milestones': milestone_list, 'owner_name': owner_name, 'repo_name': repo_name})
+                 'milestones': milestone_list, 'owner_name': owner_name, 'repo_name': repo_name, 'repo': repository})
 
 
 def milestones(request, owner_name, repo_name):
@@ -401,20 +412,23 @@ def commits(request, owner_name, repo_name):
     #if owner_name == request.user.username:
         #return render(request, 'igenapp/commits/commits.html',
                       #{'repo_info': {'owner_name': owner_name, 'repo_name': repo_name}})
+    repo = Repository.objects.get(repo_name=repo_name)
+    if repo.type == 'G':
+        s = requests.Session()
+        result = s.get('https://api.github.com/repos/%s/%s/commits' % (owner_name, repo_name), headers={'Content-Type':'application/json','Accept':'application/vnd.github.v3+json', 'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0'})
+        commits = json.loads(result.content.decode('utf-8'))
+        try:
+            if commits['message'] == 'Not Found':
+                repo_info = RepositoryInfo(owner_name, repo_name, [], [])
+        except:
+            result1 = s.get('https://api.github.com/repos/%s/%s/branches' % (owner_name, repo_name), headers={'Content-Type':'application/json','Accept':'application/vnd.github.v3+json', 'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0'})
+            branches = json.loads(result1.content.decode('utf-8'))
 
-    result = requests.get('https://api.github.com/repos/%s/%s/commits' % (owner_name, repo_name))
-    commits = json.loads(result.content)
+            repo_info = RepositoryInfo(owner_name, repo_name, branches, commits)
 
-    try:
-        if commits['message'] == 'Not Found':
-            repo_info = RepositoryInfo(owner_name, repo_name, [], [])
-    except:
-        result = requests.get('https://api.github.com/repos/%s/%s/branches' % (owner_name, repo_name))
-        branches = json.loads(result.content)
-
-        repo_info = RepositoryInfo(owner_name, repo_name, branches, commits)
-
-    return render(request, 'igenapp/commits/commits.html', {'repo_info': repo_info})
+        return render(request, 'igenapp/commits/commits.html', {'repo_info': repo_info})
+    else:
+        return redirect('issues', owner_name, repo_name)
 
 
 def commit(request, owner_name, repo_name, commit_id):
@@ -459,6 +473,28 @@ def delete_repository(request, owner_name, repository_id):
     Repository.objects.filter(pk=repository_id).delete()
 
     return redirect('/' + owner_name + '/repositories')
+
+
+def edit_repository(request, owner_name, repository_id):
+    repository = Repository.objects.filter(pk=repository_id).first()
+    users = User.objects.all().exclude(username=owner_name)
+
+    return render(request, 'igenapp/repository/edit_repository.html',
+                  {'users': users, 'repository': repository, 'owner_name': owner_name})
+
+
+def edit_repository_byid(request, owner_name, repository_id):
+    if request.method == "POST":
+        repository = Repository.objects.filter(pk=repository_id).first()
+        repository.contributors.clear()
+        contributors = request.POST.getlist('contributors')
+        for contributor in contributors:
+            repository.contributors.add(contributor)
+        repository.save()
+
+        return redirect('/' + owner_name + '/repositories')
+    else:
+        return redirect('/' + owner_name + '/repository/edit/' + repository_id)
 
 
 def add_repository(request, owner_name):
@@ -526,6 +562,7 @@ def signup(request):
         else:
             context = dict()
             context['form'] = form
+            context['image'] = ImageForm()
             context['message'] = "Error has occured"
             return render(request, 'igenapp/users/signup.html', context)
     else:

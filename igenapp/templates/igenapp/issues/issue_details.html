@@ -10,6 +10,7 @@
     <li class="active"><a href="/{{owner_name}}/{{repo_name}}/issues">Issues</a></li>
     <li><a href="/{{owner_name}}/{{repo_name}}/commits/">Commits</a></li>
     <li><a href="/{{owner_name}}/{{repo_name}}/graphs/">Graphs</a></li>
+    <li><a href="/{{owner_name}}/{{repo_name}}/tasks/">Tasks</a></li>
 {% endblock %}
 
 {% block body %}
@@ -85,7 +86,7 @@
                             </form>
                             <button class="btn btn-sm btn-default glyphicon glyphicon-pencil pull-right pagination-centered" onclick="editComment('{{comment.content}}', {{comment.id}}, '{{owner_name}}', '{{repo_name}}', {{issue.id}})"></button>
                         {% endif %}
-                        <b>&nbsp; {{comment.user.username}}</b>
+                        &nbsp;&nbsp;&nbsp;<a href="/{{owner_name}}/profilePreview/{{comment.user.id}}"><b>{{comment.user.username}}</b></a>
                         <span class="text-muted pull-right">{{comment.date}}</span>
                     </div>
                 </div>
@@ -122,7 +123,7 @@
                     {% csrf_token %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <strong>{{user.username}}</strong>
+                            <a href="/{{owner_name}}/profilePreview/{{user.id}}"><strong>{{user.username}}</strong></a>
                         </div>
                         <div class="panel-body">
                             <div class="row">

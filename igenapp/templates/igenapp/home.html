@@ -9,7 +9,7 @@
   <body>
     {% block navbar %}
       <li class="active"><a href="{% url 'home' owner_name %}">Home</a></li>
-      <li><a href="/{{owner_name}}/repositories">Repositories</a></li>
+      <li><a href="/{{user.username}}/repositories">Repositories</a></li>
     {% endblock %}
     {% block body %}
     <div class="row">
@@ -18,7 +18,7 @@
       </div>
     </div>
     <div class="row">
-      <a href="/{{owner_name}}/repositories" class="col-md-4 col-md-offset-1 text-center landing-link">
+      <a href="/{{user.username}}/repositories" class="col-md-4 col-md-offset-1 text-center landing-link">
         <div >
           <h2>Reposotories</h2>
         </div>
