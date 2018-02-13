@@ -673,7 +673,8 @@ def landing(request, owner_name, repo_name):
 
 def task(request, owner_name, repo_name):
     users = User.objects.all()
-    tasks_list = Task.objects.all()
+    repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
+    tasks_list = Task.objects.filter(repository=repository)
     return render(request, 'igenapp/task/tasks.html', {'tasks': tasks_list, 'users':users, 'owner_name': owner_name, 'repo_name': repo_name})
 
 
@@ -738,18 +739,18 @@ def search_task(request, owner_name, repo_name):
     print(request.POST)
     title = request.POST.get('title')
     user_id = request.POST.get('user')
+    status = request.POST.get('status')
 
     users = User.objects.all()
     repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
 
-    #tasks_list = Task.objects.filter(repository=repository).order_by('-date')
-    #if title != 'null':
-    #    tasks_list = tasks_list.filter(title=title)
     if user_id != "":
         user = get_object_or_404(User, id=user_id)
-        tasks_list = Task.objects.filter(title__contains=title, repository=repository, user=user)
-    else:
+        tasks_list = Task.objects.filter(title__contains=title, status__contains=status, repository=repository, user=user)
+    elif status == "":
         tasks_list = Task.objects.filter(title__contains=title, repository=repository)
+    else:
+        tasks_list = Task.objects.filter(title__contains=title, status=status, repository=repository)
 
     return render(request, 'igenapp/task/tasks.html',
                   {'tasks': tasks_list, 'users':users, 'owner_name': owner_name, 'repo_name': repo_name})

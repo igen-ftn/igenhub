@@ -85,8 +85,6 @@ class UserModelChoiceField(forms.ModelChoiceField):
          return obj.get_full_name()
 
 class TaskForm(forms.ModelForm):
-    users = User.objects.all()
-    USERS_CHOICES = [tuple([user, user.first_name + ' ' + user.last_name]) for user in users]
     title = forms.CharField()
     description = forms.CharField(widget=forms.Textarea)
     status = forms.CharField(widget=forms.Select(choices=STATUS_CHOICES))
