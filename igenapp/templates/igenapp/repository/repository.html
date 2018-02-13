@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block body %}
+{% load igenapp_extras %}
 <h1>Repositories</h1>
 <label>Owner: {{owner_name}}</label>
 <br /><br />
@@ -25,8 +26,12 @@
         <div class="panel panel-white post panel-shadow">
             <div class="post-heading1">
                 <div class="pull-left image">
-                    {% if image.avatar %}
-                        <img src="{{image.avatar.url}}" class="img-circle avatar1" alt="user profile image">
+                    {% if repository.author|ifinlist:images %}
+                        {% for image in images %}
+                            {% if image.user == repository.author %}
+                                 <img src="{{image.avatar.url}}" class="img-circle avatar1" alt="user profile image">
+                            {% endif %}
+                        {% endfor %}
                     {% else %}
                         <img src="http://bootdey.com/img/Content/user_1.jpg" class="img-circle avatar1"/>
                     {% endif %}
@@ -63,8 +68,12 @@
         <div class="panel panel-white post panel-shadow">
             <div class="post-heading1">
                 <div class="pull-left image">
-                    {% if image.avatar %}
-                        <img src="{{image.avatar.url}}" class="img-circle avatar1" alt="user profile image">
+                    {% if repository.author|ifinlist:images %}
+                        {% for image in images %}
+                            {% if image.user == repository.author %}
+                                 <img src="{{image.avatar.url}}" class="img-circle avatar1" alt="user profile image">
+                            {% endif %}
+                        {% endfor %}
                     {% else %}
                         <img src="http://bootdey.com/img/Content/user_1.jpg" class="img-circle avatar1"/>
                     {% endif %}

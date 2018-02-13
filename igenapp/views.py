@@ -412,7 +412,7 @@ def commits(request, owner_name, repo_name):
     #if owner_name == request.user.username:
         #return render(request, 'igenapp/commits/commits.html',
                       #{'repo_info': {'owner_name': owner_name, 'repo_name': repo_name}})
-    repo = Repository.objects.get(repo_name=repo_name)
+    repo = Repository.objects.get(repo_name=repo_name, owner_name=owner_name)
     if repo.type == 'G':
         s = requests.Session()
         result = s.get('https://api.github.com/repos/%s/%s/commits' % (owner_name, repo_name), headers={'Content-Type':'application/json','Accept':'application/vnd.github.v3+json', 'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0'})
@@ -454,14 +454,11 @@ def repositories(request, owner_name):
     controbute_to = Repository.objects.filter(contributors=request.user).all()
     all_repos = (repositories | controbute_to).distinct()
     activity = Activity.objects.filter(repository__in=all_repos).order_by('-date')
+    images = UserImage.objects.all()
 
-    try:
-        image = UserImage.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        image = None
     return render(request, 'igenapp/repository/repository.html',
                   {'repositories': repositories, 'controbute_to': controbute_to,
-                   'image': image, 'activity': activity, 'owner_name': request.user.username})
+                   'images': images, 'activity': activity, 'owner_name': request.user.username})
 
 
 def new_repository(request, owner_name):
