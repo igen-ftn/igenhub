@@ -147,7 +147,7 @@ def profile_preview(request, owner_name, user_id):
     images = UserImage.objects.all()
     repositories = Repository.objects.filter(author=user_profile).all()
     contribute_to = Repository.objects.filter(contributors=user_profile).all()
-    all_repos = repositories | contribute_to
+    all_repos = (repositories | contribute_to).distinct()
     return render(request, 'igenapp/profile/profilePreview.html', {'owner_name': owner_name, 'user': user,
                                                                    'images':images, 'user_profile': user_profile,
                                                                    'repositories': all_repos})
@@ -452,7 +452,7 @@ def selected_branch(request, owner_name, repo_name):
 def repositories(request, owner_name):
     repositories = Repository.objects.filter(author=request.user).all()
     controbute_to = Repository.objects.filter(contributors=request.user).all()
-    all_repos = repositories | controbute_to
+    all_repos = (repositories | controbute_to).distinct()
     activity = Activity.objects.filter(repository__in=all_repos).order_by('-date')
 
     try:
