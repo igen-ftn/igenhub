@@ -145,9 +145,13 @@ def profile_preview(request, owner_name, user_id):
     user = request.user
     user_profile = User.objects.get(pk=user_id)
     images = UserImage.objects.all()
-    repositories = Repository.objects.filter(author=request.user).all()
-    contribute_to = Repository.objects.filter(contributors=request.user).all()
+    repositories = Repository.objects.filter(author=user_profile).all()
+    contribute_to = Repository.objects.filter(contributors=user_profile).all()
     all_repos = repositories | contribute_to
+    for rep in all_repos:
+        print(rep.author)
+        print(rep.contributors.all())
+        print("****")
     return render(request, 'igenapp/profile/profilePreview.html', {'owner_name': owner_name, 'user': user,
                                                                    'images':images, 'user_profile': user_profile,
                                                                    'repositories': all_repos})
