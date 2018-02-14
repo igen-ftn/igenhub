@@ -1,4 +1,4 @@
-# IgenHub
+# IgenHub  [![Build Status](https://travis-ci.org/igen-ftn/igenhub.svg?branch=develop)](https://travis-ci.org/igen-ftn/igenhub)  
 Application that allows users to manage projects and work progress. Topic of class Software Configuration Management, at the University of Novi Sad, Serbia.
 
 Authors:
@@ -39,4 +39,9 @@ docker-compose run web python3 manage.py test
 ```
 ## License
 
-* MIT
+* MIT  
+
+## Dockerhub link
+[![Dockerhub](https://www.docker.com/sites/default/files/Dockerized%20Apps_icon.png)](https://hub.docker.com/r/kimnovak/igenhub/)
+
+[Image](https://hub.docker.com/r/kimnovak/igenhub/) is pushed to dockerhub using Travis CI.
