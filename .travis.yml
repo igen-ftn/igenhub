@@ -1,35 +1,54 @@
 sudo: required
 language: python
 python:
-  - "2.7"
-  - "3.5"
-
+- '3.5'
 services: docker
-# command to install dependencies
-install:
-  - pip install -r requirements.txt
-
-before_script:
-  - sudo apt-get update
-
-script:
-  - docker-compose up -d
-  - docker-compose run web python3 manage.py makemigrations
-  - docker-compose run web python3 manage.py migrate
-  - docker-compose ps
-
-after_script:
-  - docker-compose down
-
-after_failure:
-  - docker-compose down
-
-env:
-  - DOCKER_COMPOSE_VERSION = 1.4.2
-
 before_install:
-  - docker --version
-
+- docker login -u "$DOCKER_HUB_USERNAME" -p "$DOCKER_HUB_PASSWORD"
+- openssl aes-256-cbc -K $encrypted_83630750896a_key -iv $encrypted_83630750896a_iv
+  -in deploy_key.enc -out ./deploy_key -d
+- docker --version
+install:
+- pip install -r requirements.txt
+before_script:
+- sudo apt-get update
+script:
+- docker-compose up -d
+- docker-compose run web python3 manage.py makemigrations
+- docker-compose run web python3 manage.py migrate
+- docker-compose ps
+after_script:
+- docker-compose down
+after_failure:
+- docker-compose down
+after_success:
+- sudo rm -r postgres-data
+- docker build -t $DOCKER_HUB_USERNAME/igenhub .
+- docker push $DOCKER_HUB_USERNAME/igenhub:latest
+- export SSHPASS=$DEPLOY_PASS
+addons:
+  apt:
+    packages:
+    - sshpass
+before_deploy:
+- chmod +x ./deploy.sh
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: chmod 600 deploy_key && sshpass -e ssh -o StrictHostKeyChecking=no -i ./deploy_key
+    $HOST@$HOST_IP 'cd tim-igen && ./deploy.sh'
+  on:
+    branch: develop
+env:
+  matrix:
+  - DOCKER_COMPOSE_VERSION = 1.4.2
+  global:
+  - secure: YHzCzU/DXhS5BnYUvVS23cV53dAnzFvJGAcgx+P7rMAiuRWs5hQQ/gVdDrHQPjOfnAewS6q623StoMPG7yoCiD3EQ6wAE7KSItt1j4PIB2GCaQAB3yyBqgq0l7NMkgQDvbpfIjYPHOMFhAJxn1yMBIAdn7JbsaalS+C/C2aGu1+MqPSMYiAlQsJ5BcKh8ysNzmoGxyZKZTCiVLEwwa+RK+tb5pXsIjInLY2R3nsxw0Dd6jr7VWODVZw5Jl2zpcaBQ7mhcFd1IDUFI6RVjG9o2U+/fAZnNmnRaknPRB4ewEOVDUb6Oxh6oEWt6mx172BXabwlO3H5CpmrGFlQJby5slJKg/VU88UVv0ZZQ6tcNgIUvy/FjzAHyIjKrsjmg8M4y/XO28OFd0R2+UHknbQT7e/FG5R+b1HzhQ/U0wEJ3k0tK1Ih4weR07WzAwH5rtXC8bNwqcG3YeRrI2e8FvCcqTLcfYsYZuk1oj2l3IhV9n4wrGlBN8PRMOBBvLUwzyXHIkv9dERbMwrgUlKqydaW0dOPwD+/4gTn+2WWvm9fQlYe3EPI5Jmd7+sjns3QpZhXhD87xtI9TUp37FueSrPOG2VkhBnZKYbhESXleRlfgaGoEqe1/f2Hm2sx/3hu73Mqpgkajmrqo23YWXWpONkD9TYxdQL4fzPrL3S+DNcgiHc=
+  - secure: OTPN/fh8m7n2mYbdek4jwwSV5rRTn8t4DfQxftl2WYG6zfMxPGE/NeL2qiT0PzvVfV7I2fV/FEFu+4hYx759tupqdmTqZ87CoeJ5nOvTJSe6yKS2XTjBELSfbpaZHO1EF0MP1bziYbDWFqWbq3b4hriRAWAuXLHeLO7UzZ/SVkKuKtr1M6K9B5dvWyZ85g4Acf6VPSzScWq28hRRf6b158xar+0/wQHk0sNy+iTf/DTmx6p4aYmDtccWWAamaLQ3hJCSwuichCuuvFL6OKrzaEsB6AxpNwTtCbWWLn1z1pInP64PAXHojt6A0KTI37PzVwjQJdzqXqCVdI9o1jltwYJtrB2QU1DD4+JV96DvwCe6UsTL4E2LDDedZbQIWPNypHRacOnUQ8+S2xm6DTSnp4bV1vBW7jB+MWtqQCOXSTdLfH1/8HVWle6lCxvLlZuQAxhaCV3834hpYMbdb6kQhcBW8sLGTaIiBFn0OD9iU3wDH9Gh18hhPXi4CjZhMN7O/4PlOLy2rRrxkfgAM2h9hkM4jeNjXpeNw4eJRGv3ILG/91om4sQsH9JlekMteeIdzjfsm5LPWaOuClJmLIfHbCyc/2SbostVv9aIKXqhfkq55AG5W+rVJmcIyO22UxVLy11QYnaJU7bMV1+gSRvAk60eBO4iZD9Aea8pxgIO1JE=
+  - secure: gWSi3BvCrRxpOYPHNYxMxenV42oUVWCv1XFLznVwpxSt5Q6BpOStX3koYHovxxsRHsYk5NB1EYAtQxRawLJG+BxbgxC8Iz6eFHs3aatLGEdB5vDNK+x7GG9Tlnx3RE3N/nN24l1FOdZuZXgcDjnGd1cWZ6vYz2o/k9bFt2uK140mTrZoNS8aWnaz9aiequGvL2tIUE63pyDKfXaWcTWAWE5loykb0XzIzUPa0UdHo3ObNY3RlJ/UurPDTj69xL3SePz5Ha4sn3Meyt5TFKuYts49jVBO9ECQStzCsBQwDP0A05SLrpmSoNCR7XLD6WCdnHC30DU10nJhfA2DMAsSgjEAMFmK3A6RfK0R8d5ns+FjesPV+k2ABWOE6eP1Wun7N6UwOtF6399y1IghcUGCwEpGkJSF9BhXjKGMY7Fth7c3D+WTzq+AiIFSWB/CYos8789v3Ek0LKg4l00CHvfaWDHeEqtiDJ3nGHlRMidegIXlL8KmzCoqrJ0Qel4JpCWEgvUMzEEptM18WL55tVeLZ1sHyFfm6QYmvBtnunPO/ZNpqh+1mYxPOdG6oGLlcUMcXELoaW1MD4EByA59pKo78wpvMDE97L8hOyv00/MDR16mzE2QhQ3J/3D3avfSSPfUBBqVzCLgtiVzYeXgziigotJx9EjSqrt7s8jXAAVPrWw=
+  - secure: Z91DA6TRt9s4UE9JI9+p97ZlZzf11FbCl9V9+P71rwgfShAOQR7QM6oG7OmlJd5n8tZBlkVmhjnwXJ/IsNgVJwYrQ5OdnT2pdowTNNIrQVz9aehZzf9zTj7HLlAGYVg+oMR4l6xtpEJ2XI8laI0KBxWWYFi0Y6uZ1u4cWvcbPU7+pkS8nOvndZNF2NlCL94pHbaO+uVdGkbLUAXreTShYZZvzgf1Sd07ngiHmnRf1x13qzZKXqZOQ6JLX7WtXvSJO7WrabSyQUe1DczK8VLn34y7l13gWwJ/38f2fryRIXvGxQ1B1Aa62g2MFhO6LitY1wO4SEYlDs82kZ9vhedv64/xkhs+RGSq2d+agfK8xSmoImRQ8/b+bUuVW4qfE68CPGB5jQd0Okh6JvDbgf1nyKOmFomsmfTXP/QbdsoABOXu7RSUbgCii5TzdxhgMni0SGP5t5nHG6P2fJbeXeZFw7+V7IKJWs2cxM/l1/uDka7CT7Ih7IVMKJJqZaEwwCnFqFWd08BeXHf1jq1zGO35Dm6bHx1I/8ipWgckgquV+1kDNeKUxQuzFdWCPFXw78P6mz3uxaH3SF0QuITPyzWVMdfwc8YonTmc9CvvMkZ1JjM8eTjQnKbYBqfKhDXa+/G//1rD7ShX4vurovCk3H3W3JzlIcx68o6P9My82U2lECk=
+  - secure: CLJTlqT/UXpATY2+TMIB7DReS2Hs1upEhwzPqA/YOMmcboZgFJ24318Mh+GPYFDuP4XawBM5/cdFEhfKLbXfAzOG3hlCAZ8e5fmhEh2y+lG7HlG6cEzYGhhNkVBtAmYaMQiQl9pCjQe2lXh2LuRNYUShUxVPY06dCKdN1VyuOWWMEYbg+w45YryRb5/Hu6E1WEmdzMh0vhjrI+bRgqkClyk4PdebTukWouKI9x1JpEc5LMoIwdRu7znZvTZl6l/IzPMnunZxiFJoxLVIuJVVoPg3o9HYJyoaDyaAMssxpm8+LXQ9WvrCDkny1skTjG+0PPyAblht4sa4opDjSRhXGr5o2ReYpPmgc7/ioJPHkawku2WMI6mJSLxzOkWoIkgQuAzezzLtaQgKYi/Y+L4FKI2HW6XCmcriOhim/dlbUFA9bXF8BMqo1djDondbkodv4KRf9W9Z5Qn6lhvJc3+21KraxQ3/pypi1yh/k/jlUobw+hmq+RYdznIzFId/Je3z8C+vWgkcUhpAvMp2XER1ZKlKltjwOd/VXztuhCn6Qh9WN5pyJTQQ04L3DXZXx4327zjLcs5cFkCbcttnotayYyFdDIO/NDAbSWn3NTQg8D6U1vUbNil8DnhduA4LNLhQKTFLh7JzjdYZwnzVnZyMjBchDoYigljG97ZNfBbOv6s=
+  - secure: ZYKj+DaD5Zi4J0MDDkEcmwVV7gk6qr8L/mOzQMvab0T+/pVg5p6wHTgRYazoVkt1/iGg4D+Kq0HSFoWbqw/Tvv0c+hejGQ3d+HNNIyuPitCbjAePcH1JRQF39bi8rnQMTymJ91x1XOX1rNPg5PMouKoxa7J2OyeYu5MIr++HaQWY99ka5gMcqUTQN8c1fCWu9hYQEFqiL1Q8ulkUACXXgUj9p+r6+dbghWIfENx7zUzMFVkNR99M/WMfZZiyVkp9tTzLQXbS0Pg6UwHAn5fNkl3lH6S1K7TAjMArYxQdBMmIjSkIyiUz7kocOdLw4kbiQ+8dIeer5hx7Jr2pXuEWgb4zUoPsljAKoLUtlUvzeLmSpgdhuEZWumc4GqEo7DgKOfY6KwVcogd+Hh5AvRy6CWjdSNB/kQxG7Uqz1xzetCIMPvq4DQhCfMzTYPqoz2fyTA71oLH4AJIbJmw2CWjoQ6g+Ri1uY+Bo8JkERs3StTWmoE9fwveR2LUr/TXrhv5v/VaP4Vt46qeVnrdADo50fmgH3Ww75LkRjFnIpQ+aS9zpnWc3ZDJIFk+juzbS7ik1E3D7AxLnoGQDKNSTi5redEoxd/Npcl1sAngTULepX2TTAyyY9PL/Kvipt7e/4d4JML10vudXZb6tJoQvh1FOsskWa1teD69+TCweG9+u4U8=
 branches:
   only:
-  - travis
+  - develop

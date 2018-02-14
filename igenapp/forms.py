@@ -63,3 +63,33 @@ class ImageForm(forms.ModelForm):
     class Meta:
         model = UserImage
         fields = ['avatar']
+
+
+STATUS_CHOICES = [
+    ('0%', '0%'),
+    ('10%', '10%'),
+    ('20%', '20%'),
+    ('30%', '30%'),
+    ('40%', '40%'),
+    ('50%', '50%'),
+    ('60%', '60%'),
+    ('70%', '70%'),
+    ('80%', '80%'),
+    ('90%', '90%'),
+    ('100%', '100%'),
+
+]
+
+class UserModelChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+         return obj.get_full_name()
+
+class TaskForm(forms.ModelForm):
+    title = forms.CharField()
+    description = forms.CharField(widget=forms.Textarea)
+    status = forms.CharField(widget=forms.Select(choices=STATUS_CHOICES))
+    user = UserModelChoiceField( queryset=User.objects.all() )
+#widget=forms.Select(choices=USERS_CHOICES)
+    class Meta:
+        model = Task
+        fields = '__all__'

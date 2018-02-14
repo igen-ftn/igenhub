@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block navbar %}
+    <li><a href="{% url 'home' owner_name %}">Home</a></li>
+    <li><a href="/{{owner_name}}/repositories">Repositories</a></li>
+    <li><a href="/{{owner_name}}/{{repo_name}}/wiki">Wiki</a></li>
+    <li><a href="/{{owner_name}}/{{repo_name}}/issues">Issues</a></li>
+    <li><a href="/{{owner_name}}/{{repo_name}}/commits/">Commits</a></li>
+    <li class="active"><a href="/{{owner_name}}/{{repo_name}}/graphs/">Graphs</a></li>
+    <li><a href="/{{owner_name}}/{{repo_name}}/tasks/">Tasks</a></li>
+{% endblock %}
+
+{% block body %}
+    <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
+    <h4>Number of Issues Submitted per date</h4>
+    <svg class="chart"></svg>
+    <h4>Number of commits per User</h4>
+    <div class="tt1"></div>
+    <style>
+        .bar {
+          fill: steelblue;
+        }
+        .bar1 {
+          fill: orange;
+        }
+
+        .axis text {
+          font: 10px sans-serif;
+        }
+
+        .axis path,
+        .axis line {
+          fill: none;
+          stroke: #000;
+          shape-rendering: crispEdges;
+        }
+
+        .x.axis path {
+          display: none;
+        }
+    </style>
+    <script>
+        var margin = {top: 20, right: 30, bottom: 20, left: 40},
+        width = 960 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
+
+
+        var x = d3.scaleBand().rangeRound([0, width/4])
+        var y = d3.scaleLinear()
+            .range([height, 0]);
+
+        var xAxis = d3.axisBottom(x)
+
+        var yAxis = d3.axisLeft(y)
+
+        var chart = d3.select(".chart")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom + 50)
+          .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        chart.append("g").append("text").style("font-size", "16px").text("Submitted Issues Count")
+        var dataj = '{{data}}'
+        dataj = dataj.replace(/&quot;/g,'"');
+        var data1 = JSON.parse(dataj)
+        d3.csv("data.csv", type, function(error, dataj) {
+          x.domain(data1.map(function(d) { return d.name; }));
+          y.domain([0, d3.max(data1, function(d) { return d.value; })]);
+
+          chart.append("g")
+              .attr("class", "x axis")
+              .attr("transform", "translate(0," + height + ")")
+              .call(xAxis).selectAll("text").style("text-anchor", "end").attr("transform", "rotate(-90)").attr("dx", "-.8em").attr("dy", "-.55em");
+
+          chart.append("g")
+              .attr("class", "y axis")
+              .call(yAxis);
+
+          chart.selectAll(".bar")
+              .data(data1)
+            .enter().append("rect")
+              .attr("class", "bar")
+              .attr("x", function(d) { return x(d.name); })
+              .attr("y", function(d) { return y(d.value); })
+              .attr("height", function(d) { return height - y(d.value); })
+              .attr("width", x.bandwidth());
+        });
+
+        function type(d) {
+          d.value = +d.value; // coerce to number
+          return d;
+        }
+        </script>
+        <script>
+        // --------------------------------------------------------------------------------------
+        var dataj1 = '{{commits}}'
+        dataj1 = dataj1.replace(/&quot;/g,'"');
+        var data11 = JSON.parse(dataj1)
+        if(data11) {
+            var margin = {top: 20, right: 30, bottom: 30, left: 40},
+            width = 960 - margin.left - margin.right,
+            height = 500 - margin.top - margin.bottom;
+
+
+            var x1 = d3.scaleBand().rangeRound([0, data11.length* width/15])
+            var y1 = d3.scaleLinear()
+                .range([height, 0]);
+
+            var xAxis1 = d3.axisBottom(x1)
+
+            var yAxis1 = d3.axisLeft(y1)
+
+            var chart1 = d3.select(".tt1").append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom + 90)
+              .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            chart1.append("g").append("text").style("font-size", "16px").text("Commits per user")
+            var dataj1 = '{{commits}}'
+            dataj1 = dataj1.replace(/&quot;/g,'"');
+            var data11 = JSON.parse(dataj1)
+            d3.csv("data1.csv", type, function(error, dataj1) {
+              x1.domain(data11.map(function(d) { return d.name; }));
+              y1.domain([0, d3.max(data11, function(d) { return d.value; })]);
+
+              chart1.append("g")
+                  .attr("class", "x axis")
+                  .attr("transform", "translate(0," + height + ")")
+                  .call(xAxis1).selectAll("text").style("text-anchor", "end").attr("transform", "rotate(-90)").attr("dx", "-.8em").attr("dy", "-.55em");
+
+              chart1.append("g")
+                  .attr("class", "y axis")
+                  .call(yAxis1);
+
+              chart1.selectAll(".bar")
+                  .data(data11)
+                .enter().append("rect")
+                  .attr("class", "bar1")
+                  .attr("x", function(d) { return x1(d.name); })
+                  .attr("y", function(d) { return y1(d.value); })
+                  .attr("height", function(d) { return height - y1(d.value); })
+                  .attr("width", x1.bandwidth());
+            });
+
+            function type(d) {
+              d.value = +d.value; // coerce to number
+              return d;
+            }
+        }
+    </script>
+{% endblock %}

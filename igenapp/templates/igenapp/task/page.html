@@ -6,11 +6,11 @@
 {% block navbar %}
     <li><a href="{% url 'home' owner_name %}">Home</a></li>
     <li><a href="/{{owner_name}}/repositories">Repositories</a></li>
-    <li class="active"><a href="/{{owner_name}}/{{repo_name}}/wiki">Wiki</a></li>
+    <li><a href="/{{owner_name}}/{{repo_name}}/wiki">Wiki</a></li>
     <li><a href="/{{owner_name}}/{{repo_name}}/issues">Issues</a></li>
     <li><a href="/{{owner_name}}/{{repo_name}}/commits/">Commits</a></li>
     <li><a href="/{{owner_name}}/{{repo_name}}/graphs/">Graphs</a></li>
-    <li><a href="/{{owner_name}}/{{repo_name}}/tasks/">Tasks</a></li>
+    <li class="active"><a href="/{{owner_name}}/{{repo_name}}/tasks/">Tasks</a></li>
 {% endblock %}
 
 {% block body %}
@@ -18,19 +18,23 @@
 <div class="row">
   <div class="row">
     <div class="col-md-8">
-      <h2>{{wiki.title}}</h2>
+      <h2>{{task.title}}</h2>
     </div>
     <div class="col-md-4">
       <div class="btn-group">
-        <a href="/{{owner_name}}/{{repo_name}}/wiki/" class="btn btn-primary">Back To Wiki</a>
-        <a href="/{{owner_name}}/{{repo_name}}/wiki-edit/{{wiki.id}}" class="btn btn-warning">Edit</a>
-        <a href="/{{owner_name}}/{{repo_name}}/wiki-remove/{{wiki.id}}" class="btn btn-danger">Delete</a>
+        <a href="/{{owner_name}}/{{repo_name}}/tasks/" class="btn btn-primary">Back To Tasks</a>
+        <a href="/{{owner_name}}/{{repo_name}}/task-edit/{{task.id}}" class="btn btn-warning">Edit</a>
+        <a href="/{{owner_name}}/{{repo_name}}/task-remove/{{task.id}}" class="btn btn-danger">Delete</a>
       </div>
     </div>
   </div>
-    <div class="col-md-12 col-lg-11 container panel row">
-        <p class="col-md-12 col-lg-11" style="word-break: break-all">{{wiki.content}}</p>
-    </div>
+  <div class="row">
+    <label>Assigned to: </label> {{task.user.first_name}} {{task.user.last_name}}
+    <label>  Status: </label> {{task.status}} done.
+  </div>
+  <div class="col-md-12 col-lg-11 container panel row">
+      <p class="col-md-12 col-lg-11" style="word-break: break-all">{{task.description}}</p>
+  </div>
 </div>
 
 <!-- comments -->
@@ -55,17 +59,17 @@
                 <div class="panel-heading">
                     <div class="row">
                         {% if comment.user.username == user.username %}
-                            <form action="{% url 'delete_comment' owner_name repo_name 'wiki' wiki.id comment.id %}" method="post">
+                            <form action="{% url 'delete_comment' owner_name repo_name 'task' task.id comment.id %}" method="post">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-sm btn-default glyphicon glyphicon-remove pull-right pagination-centered"></button>
                             </form>
                             <button class="btn btn-sm btn-default glyphicon glyphicon-pencil pull-right pagination-centered" onclick="editComment('{{comment.content}}', {{comment.id}}, '{{owner_name}}', '{{repo_name}}', {{issue.id}})"></button>
                         {% endif %}
-                        &nbsp;&nbsp;&nbsp;<a href="/{{owner_name}}/profilePreview/{{comment.user.id}}"><b>{{comment.user.username}}</b></a>
+                        <b>&nbsp; {{comment.user.username}}</b>
                         <span class="text-muted pull-right">{{comment.date}}</span>
                     </div>
                 </div>
-                <form method="post" action="{% url 'edit_comment' owner_name repo_name 'wiki' wiki.id %}">
+                <form method="post" action="{% url 'edit_comment' owner_name repo_name 'task' task.id %}">
                     {% csrf_token %}
                     <div class="panel-body" id="editCom{{comment.id}}">
                         {{comment.content}}
@@ -94,11 +98,11 @@
                 </div>
             </div>
             <div class="col-sm-5">
-                <form action="{% url 'add_comment' owner_name repo_name 'wiki' wiki.id %}" method="post">
+                <form action="{% url 'add_comment' owner_name repo_name 'task' task.id %}" method="post">
                     {% csrf_token %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <a href="/{{owner_name}}/profilePreview/{{user.id}}"><strong>{{user.username}}</strong></a>
+                            <strong>{{user.username}}</strong>
                         </div>
                         <div class="panel-body">
                             <div class="row">

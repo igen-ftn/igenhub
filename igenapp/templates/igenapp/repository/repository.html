@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block body %}
+{% load igenapp_extras %}
 <h1>Repositories</h1>
 <label>Owner: {{owner_name}}</label>
 <br /><br />
@@ -25,8 +26,12 @@
         <div class="panel panel-white post panel-shadow">
             <div class="post-heading1">
                 <div class="pull-left image">
-                    {% if image.avatar %}
-                        <img src="{{image.avatar.url}}" class="img-circle avatar1" alt="user profile image">
+                    {% if repository.author|ifinlist:images %}
+                        {% for image in images %}
+                            {% if image.user == repository.author %}
+                                 <img src="{{image.avatar.url}}" class="img-circle avatar1" alt="user profile image">
+                            {% endif %}
+                        {% endfor %}
                     {% else %}
                         <img src="http://bootdey.com/img/Content/user_1.jpg" class="img-circle avatar1"/>
                     {% endif %}
@@ -44,6 +49,9 @@
                 <div class="col-sm-2" style="float:right; width: 55px;">
                     <a href="/{{owner_name}}/repository/delete/{{repository.id}}" class="btn btn-danger btn-circle text-uppercase"><span class="glyphicon glyphicon-remove"></span></a>
                 </div>
+                <div class="col-sm-2" style="float:right; width: 55px;">
+                    <a href="/{{owner_name}}/repository/edit/{{repository.id}}" class="btn btn-warning btn-circle text-uppercase"><span class="glyphicon glyphicon-edit"></span></a>
+                </div>
             </div>
         </div>
     </div>
@@ -60,8 +68,12 @@
         <div class="panel panel-white post panel-shadow">
             <div class="post-heading1">
                 <div class="pull-left image">
-                    {% if image.avatar %}
-                        <img src="{{image.avatar.url}}" class="img-circle avatar1" alt="user profile image">
+                    {% if repository.author|ifinlist:images %}
+                        {% for image in images %}
+                            {% if image.user == repository.author %}
+                                 <img src="{{image.avatar.url}}" class="img-circle avatar1" alt="user profile image">
+                            {% endif %}
+                        {% endfor %}
                     {% else %}
                         <img src="http://bootdey.com/img/Content/user_1.jpg" class="img-circle avatar1"/>
                     {% endif %}
@@ -87,7 +99,7 @@
     <div class="col-sm-8">
         <h4>Activity:</h4>
         {% for act in activity %}
-            <p style="width:90%"><span class="glyphicon glyphicon-user"></span> <b>{{act.user}}</b> <i><a href="{{act.link}}">{{act.text}} </a></i> in <b>{{act.repository.repo_name}}</b>
+            <p style="width:90%"><span class="glyphicon glyphicon-user"></span> <a style="color: #333;" href="/{{owner_name}}/profilePreview/{{act.user.id}}"><b>{{act.user}}</b></a> <i><a href="{{act.link}}">{{act.text}} </a></i> in <b>{{act.repository.repo_name}}</b>
             &nbsp;&nbsp;<span style="float:right">&nbsp;{{act.date}}</span><span style="float:right" class="glyphicon glyphicon-calendar"></span>
             </p>
         {% endfor %}
