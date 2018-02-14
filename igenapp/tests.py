@@ -4,7 +4,7 @@ from .forms import *
 from .views import *
 from django.utils import timezone
 from django.contrib.auth.models import User
-
+from django.urls import reverse
 
 class IssueTests(TestCase):
 
@@ -137,6 +137,7 @@ class RepositoryTests(TestCase):
         self.client.logout()
 
 class CommentTests(TestCase):
+    """Preparing data"""
     def setUp(self):
         self.factory = RequestFactory()
         self.user = User.objects.create_user(username="commentUser", password="comment", email="comment@gmail.com")
@@ -146,6 +147,7 @@ class CommentTests(TestCase):
                                           date=timezone.now(), status='O', user=self.user, repository=self.repository)
         self.comment = Comment.objects.create(user=self.user, issue=self.issue, content="test test test",
                                               date=timezone.now())
+    """Test if comment is created properly"""
     def test_create_comment(self):
         self.assertTrue(isinstance(self.comment, Comment))
         self.assertIsNotNone(self.comment.content)
@@ -154,9 +156,30 @@ class CommentTests(TestCase):
         self.assertEqual(self.comment.content, "test test test")
         self.assertEqual(self.comment.issue, self.issue)
         self.assertIsNotNone(self.comment.date)
-
+    """Test if correct view is called and if it returns status 200"""
     def test_comment_view(self):
         request = self.factory.get('/' + self.user.username + '/' + self.repository.repo_name + '/issues' + '/' + str(self.comment.issue.id))
         request.user = self.user
         response = issue_details(request, self.comment.issue.repository.owner_name, self.comment.issue.repository.repo_name, self.comment.issue.id)
         self.assertEqual(response.status_code, 200)
+
+    def test_url(self):
+        url = reverse('issue_details',
+                      args=[self.comment.user.username, self.comment.issue.repository.repo_name, self.comment.issue.id])
+        url_build = "/" + self.comment.user.username + "/" + self.comment.issue.repository.repo_name + "/issues/" + str(self.comment.issue.id) + "/"
+        self.assertEqual(url, url_build)
+
+    def test_edit_comment(self):
+        edit_com = Comment.objects.get(id=self.comment.id)
+        edit_com.content = "edited"
+        edit_com.save()
+        edited_comment = Comment.objects.get(id=self.comment.id)
+        self.assertEqual(edited_comment.content, "edited")
+
+    def test_delete_comment(self):
+        del_com = Comment.objects.get(id=self.comment.id)
+        checkid = self.comment.id
+        del_com.delete()
+        self.assertRaises(Comment.DoesNotExist, Comment.objects.get, id = checkid)
+        self.assertFalse(Comment.objects.filter(id=checkid).exists())
+
