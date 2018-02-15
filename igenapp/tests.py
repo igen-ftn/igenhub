@@ -183,3 +183,58 @@ class CommentTests(TestCase):
         self.assertRaises(Comment.DoesNotExist, Comment.objects.get, id = checkid)
         self.assertFalse(Comment.objects.filter(id=checkid).exists())
 
+
+class TasksTests(TestCase):
+
+    """Preparing data"""
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.user = User.objects.create(username="user2", password="user2", email="user2@gmail.com")
+        self.repository = Repository.objects.create(author=self.user, repo_name="repo2",
+                                                    owner_name=self.user.username, type='L')
+        self.task = Task.objects.create(title="Task Ex", description="This is a example task", status='0%', user=self.user, repository=self.repository)
+
+
+    """Creating new task test"""
+    def test_create_task(self):
+        self.assertTrue(isinstance(self.task, Task))
+        self.assertEqual(self.task.description, "This is a example task")
+        self.assertEqual(self.task.title, "Task Ex")
+        self.assertEqual(self.task.status, "0%")
+        self.assertEqual(self.task.user.username, "user2")
+
+    """View test"""
+    def test_tasks_view(self):
+        request = self.factory.get('/' + self.user.username + '/' + self.repository.repo_name + '/tasks')
+        request.user = self.user
+        response = task(request, self.user.username, 'repo2')
+        self.assertEqual(response.status_code, 200)
+
+    """User adding task test"""
+    def test_adding_task(self):
+        # Log in
+        self.client.force_login(self.user)
+
+        # Go to Tasks page
+        url = '/' + self.user.username + '/' + self.repository.repo_name + '/tasks/'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # There should be one task
+        self.assertQuerysetEqual(response.context['tasks'], ['<Task: Task object>'])
+
+        # Create task
+        url = '/' + self.user.username + '/' + self.repository.repo_name + '/add_issue/0/'
+        response = self.client.post(url, {'title': "Task", 'description': "Do this and that.", 'status': "0%"})
+        self.assertEqual(response.status_code, 200)
+
+        # Go back to the tasks page
+        url = '/' + self.user.username + '/' + self.repository.repo_name + '/tasks/'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # Repository list should not be empty and should have size 2
+        self.assertEqual(len(response.context['tasks'].all()), 1)
+
+        # Log out
+        self.client.logout()

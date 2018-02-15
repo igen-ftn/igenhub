@@ -70,9 +70,7 @@ def graphs(request, owner_name, repo_name):
 def wiki(request, owner_name, repo_name):
     repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
     wikipages_list = WikiPage.objects.filter(repository=repository)
-    #wikipages_list = WikiPage.objects.all()
     return render(request, 'igenapp/wiki.html', {'wikipages': wikipages_list, 'owner_name': owner_name, 'repo_name': repo_name})
-    #return render(request, 'igenapp/wiki.html')
 
 
 def wiki_form(request, owner_name, repo_name):
@@ -719,7 +717,7 @@ def task_form(request, owner_name, repo_name):
             repository = get_object_or_404(Repository, owner_name=owner_name, repo_name=repo_name)
             task = Task(title=form.cleaned_data['title'], description=form.cleaned_data['description'], status=form.cleaned_data['status'] , repository=repository, user=form.cleaned_data['user'])
             task.save()
-            create_activity(request, owner_name, repo_name, ' created task page ', '/'+owner_name+'/'+repo_name+'/task')
+            create_activity(request, owner_name, repo_name, ' created task page ', '/'+owner_name+'/'+repo_name+'/tasks')
             return redirect('task', owner_name, repo_name)
         else:
             context = dict()
@@ -743,7 +741,7 @@ def task_page(request, owner_name, repo_name, task_id):
 
 def remove_task(request, owner_name, repo_name, task_id):
     Task.objects.filter(pk=task_id).delete()
-    create_activity(request, owner_name, repo_name, ' removed task page ', '/' + owner_name + '/' + repo_name + '/wiki')
+    create_activity(request, owner_name, repo_name, ' removed task page ', '/' + owner_name + '/' + repo_name + '/tasks')
     task_list = Task.objects.all()
     return redirect('task', owner_name, repo_name)
 
@@ -755,6 +753,7 @@ def edit_task(request, owner_name, repo_name, task_id):
         if form.is_valid():
 
             form.save()
+            create_activity(request, owner_name, repo_name, ' edited task page ', '/' + owner_name + '/' + repo_name + '/tasks')
             return redirect('task', owner_name, repo_name)
         else:
             context = dict()
