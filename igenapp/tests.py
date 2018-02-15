@@ -210,6 +210,16 @@ class TasksTests(TestCase):
         response = task(request, self.user.username, 'repo2')
         self.assertEqual(response.status_code, 200)
 
+    """task form test"""
+    def test_task_form(self):
+        data = {'title': "Task one", 'description': "do this", 'status':'0%', 'user':self.user.id}
+        form = TaskForm(data=data)
+        self.assertTrue(form.is_valid())
+
+        data = {'title': "", 'description': "Mr. Slave", 'status':'0%'}
+        form = WikiForm(data=data)
+        self.assertFalse(form.is_valid())
+
     """User adding task test"""
     def test_adding_task(self):
         # Log in
@@ -224,9 +234,9 @@ class TasksTests(TestCase):
         self.assertQuerysetEqual(response.context['tasks'], ['<Task: Task object>'])
 
         # Create task
-        url = '/' + self.user.username + '/' + self.repository.repo_name + '/add_issue/0/'
-        response = self.client.post(url, {'title': "Task", 'description': "Do this and that.", 'status': "0%"})
-        self.assertEqual(response.status_code, 200)
+        url = '/' + self.user.username + '/' + self.repository.repo_name + '/task-form/'
+        response = self.client.post(url, {'title': "Task", 'description': "Do this and that.", 'status': "0%", 'user':self.user.id})
+        self.assertEqual(response.status_code, 302)
 
         # Go back to the tasks page
         url = '/' + self.user.username + '/' + self.repository.repo_name + '/tasks/'
@@ -234,7 +244,71 @@ class TasksTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
         # Repository list should not be empty and should have size 2
-        self.assertEqual(len(response.context['tasks'].all()), 1)
+        self.assertEqual(len(response.context['tasks'].all()), 2)
+
+        # Log out
+        self.client.logout()
+
+
+class WikiTests(TestCase):
+
+    """Preparing data"""
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.user = User.objects.create(username="user3", password="user3", email="user3@gmail.com")
+        self.repository = Repository.objects.create(author=self.user, repo_name="repo3",
+                                                    owner_name=self.user.username, type='L')
+        self.wiki = WikiPage.objects.create(title="Wiki Ex", content="This is a example wiki", repository=self.repository)
+
+
+    """Creating new wikipage test"""
+    def test_create_wiki(self):
+        self.assertTrue(isinstance(self.wiki, WikiPage))
+        self.assertEqual(self.wiki.content, "This is a example wiki")
+        self.assertEqual(self.wiki.title, "Wiki Ex")
+        self.assertEqual(self.wiki.repository.repo_name, "repo3")
+
+    """View test"""
+    def test_wiki_view(self):
+        request = self.factory.get('/' + self.user.username + '/' + self.repository.repo_name + '/wiki')
+        request.user = self.user
+        response = wiki(request, self.user.username, 'repo3')
+        self.assertEqual(response.status_code, 200)
+
+    """Wiki form test"""
+    def test_wiki_form(self):
+        data = {'title': "Wikiliks", 'content': "Lemiviks"}
+        form = WikiForm(data=data)
+        self.assertTrue(form.is_valid())
+
+        data = {'title': "", 'content': "Mr. Slave"}
+        form = WikiForm(data=data)
+        self.assertFalse(form.is_valid())
+
+    """User adding wiki test"""
+    def test_adding_wiki(self):
+        # Log in
+        self.client.force_login(self.user)
+
+        # Go to wiki
+        url = '/' + self.user.username + '/' + self.repository.repo_name + '/wiki/'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # There should be one wiki
+        self.assertQuerysetEqual(response.context['wikipages'], ['<WikiPage: WikiPage object>'])
+
+        url = '/' + self.user.username + '/' + self.repository.repo_name + '/wiki-form/'
+        response = self.client.post(url, {'title':"asdfff", 'content':"idnjdfnsdf jfsd sdfo"})
+        self.assertEqual(response.status_code, 302)
+
+        # Go back to the tasks page
+        url = '/' + self.user.username + '/' + self.repository.repo_name + '/wiki/'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # Repository list should not be empty and should have size 2
+        self.assertEqual(len(response.context['wikipages'].all()), 2)
 
         # Log out
         self.client.logout()

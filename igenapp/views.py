@@ -699,8 +699,8 @@ def delete_comment(request, owner_name, repo_name, parent, parent_id, comment_id
             return redirect('wiki-page', owner_name, repo_name, parent_id)
 
 
-def landing(request, owner_name, repo_name):
-    return render(request, 'igenapp/landingpage.html', owner_name, repo_name)
+def landing(request):
+    return render(request, 'igenapp/landingpage.html')
 
 
 def task(request, owner_name, repo_name):

@@ -57,7 +57,7 @@ class WikiForm(forms.ModelForm):
 
     class Meta:
         model = WikiPage
-        fields = '__all__'
+        fields = ['title', 'content']
 
 class ImageForm(forms.ModelForm):
     class Meta:
@@ -92,4 +92,4 @@ class TaskForm(forms.ModelForm):
 #widget=forms.Select(choices=USERS_CHOICES)
     class Meta:
         model = Task
-        fields = '__all__'
+        fields = ['title', 'description', 'status', 'user']

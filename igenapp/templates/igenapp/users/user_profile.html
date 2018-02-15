@@ -13,7 +13,7 @@
     <h3>Profile:</h3>
     <p>{{message}}</p>
     <div class="row">
-        <img src="{{ image.avatar.url }}"/>
+        <img src="{{ image.avatar.url }}" style="width:349px"/>
         <form method="POST" class="post-form" action="{% url 'remove_avatar' %}">
             {% csrf_token %}
             <button type="submit" class="btn btn-danger btn-sm">Remove Avatar</button>

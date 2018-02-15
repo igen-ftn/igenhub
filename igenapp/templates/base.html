@@ -31,8 +31,12 @@
           <a class="navbar-brand" href="#">IgenHub</a>
         </div>
         <ul class="nav navbar-nav">
+          {% if user.is_authenticated %}
             {% block navbar %}
             {% endblock %}
+          {% else %}
+            <li><a href="{% url 'landing' %}">Home</a></li>
+          {% endif %}
         </ul>
         <ul class="nav navbar-nav navbar-right p-r-4">
           {% if user.is_authenticated %}
