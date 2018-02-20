@@ -39,7 +39,7 @@ deploy:
   script: chmod 600 deploy_key && sshpass -e ssh -o StrictHostKeyChecking=no -i ./deploy_key
     $HOST@$HOST_IP 'cd tim-igen && ./deploy.sh'
   on:
-    branch: develop
+    branch: master
 env:
   matrix:
   - DOCKER_COMPOSE_VERSION = 1.4.2
@@ -52,4 +52,4 @@ env:
   - secure: ZYKj+DaD5Zi4J0MDDkEcmwVV7gk6qr8L/mOzQMvab0T+/pVg5p6wHTgRYazoVkt1/iGg4D+Kq0HSFoWbqw/Tvv0c+hejGQ3d+HNNIyuPitCbjAePcH1JRQF39bi8rnQMTymJ91x1XOX1rNPg5PMouKoxa7J2OyeYu5MIr++HaQWY99ka5gMcqUTQN8c1fCWu9hYQEFqiL1Q8ulkUACXXgUj9p+r6+dbghWIfENx7zUzMFVkNR99M/WMfZZiyVkp9tTzLQXbS0Pg6UwHAn5fNkl3lH6S1K7TAjMArYxQdBMmIjSkIyiUz7kocOdLw4kbiQ+8dIeer5hx7Jr2pXuEWgb4zUoPsljAKoLUtlUvzeLmSpgdhuEZWumc4GqEo7DgKOfY6KwVcogd+Hh5AvRy6CWjdSNB/kQxG7Uqz1xzetCIMPvq4DQhCfMzTYPqoz2fyTA71oLH4AJIbJmw2CWjoQ6g+Ri1uY+Bo8JkERs3StTWmoE9fwveR2LUr/TXrhv5v/VaP4Vt46qeVnrdADo50fmgH3Ww75LkRjFnIpQ+aS9zpnWc3ZDJIFk+juzbS7ik1E3D7AxLnoGQDKNSTi5redEoxd/Npcl1sAngTULepX2TTAyyY9PL/Kvipt7e/4d4JML10vudXZb6tJoQvh1FOsskWa1teD69+TCweG9+u4U8=
 branches:
   only:
-  - develop
+  - master
